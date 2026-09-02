@@ -205,19 +205,19 @@
             { nis: "2026", nama: "Muhtazam Afreza", password: "123" }
         ];
 
-        // --- DATA PASANGAN CALON ---
+        // --- DATA PASANGAN CALON (Bikini Bottom Edition) ---
         const candidates = [
             { 
                 id: 1, label: "Paslon Nomor 1", 
-                ketua: "Andi Pratama", kelasK: "X A", imgK: "https://images.pexels.com/photos/1462637/pexels-photo-1462637.jpeg?auto=compress&w=200",
-                wakil: "Salsabila Putri", kelasW: "X A", imgW: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&w=200", 
-                visi: "Mewujudkan OSIS yang aktif, kreatif, disiplin, dan menjadi wadah bagi siswa untuk berkembang."
+                ketua: "SpongeBob SquarePants", kelasK: "XI IPA", imgK: "https://i.ibb.co.com/7dZ4g5x/1000924252.jpg",
+                wakil: "Patrick Star", kelasW: "XI IPS", imgW: "https://i.ibb.co.com/93x47w5/1000924251.jpg", 
+                visi: "Mewujudkan lingkungan sekolah yang ceria, penuh kreativitas, dan rajin memproduksi Krabby Patty kebaikan."
             },
             { 
                 id: 2, label: "Paslon Nomor 2", 
-                ketua: "Rizky Maulana", kelasK: "X B", imgK: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&w=200",
-                wakil: "Aulia Rahma", kelasW: "X B", imgW: "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&w=200", 
-                visi: "Membangun lingkungan sekolah yang kompak, berprestasi, nyaman, dan penuh semangat kebersamaan."
+                ketua: "Squidward Tentacles", kelasK: "XII Bahasa", imgK: "https://i.ibb.co.com/84x86s7/1000924268.jpg",
+                wakil: "Tuan Krabs", kelasW: "XII IPA", imgW: "https://i.ibb.co.com/7v5933V/1000924253.jpg", 
+                visi: "Membangun kedisiplinan tingkat tinggi, seni estetika yang elegan, dan manajemen keuangan OSIS yang menguntungkan."
             }
         ];
 
@@ -231,10 +231,20 @@
             window.scrollTo(0, 0);
         }
 
-        // --- REALTIME LISTENER STATUS VOTING ---
+        // --- REALTIME LISTENER STATUS VOTING & AUTO-CLOSE ---
         db.ref('votingConfig').on('value', (snapshot) => {
             const config = snapshot.val() || { isOpen: false, endTime: null };
             updateBanner(config);
+
+            // Jika voting ditutup secara otomatis dari sistem (waktu habis) dan user sedang di halaman kandidat, tendang ke login / beri peringatan
+            if (!config.isOpen) {
+                const candidatesPage = document.getElementById('candidates-page');
+                const confirmPage = document.getElementById('confirmation-page');
+                if (!candidatesPage.classList.contains('hidden') || !confirmPage.classList.contains('hidden')) {
+                    alert("Waktu pemilihan telah habis! Sesi voting otomatis ditutup oleh sistem.");
+                    logout();
+                }
+            }
         });
 
         function updateBanner(config) {
@@ -250,6 +260,7 @@
                 const now = new Date().getTime();
                 const distance = config.endTime - now;
                 if (distance < 0) {
+                    // WAKTU HABIS: Otomatis perbarui database jadi tutup (Auto-Close serentak)
                     db.ref('votingConfig').set({ isOpen: false, endTime: null });
                 } else {
                     const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -266,7 +277,7 @@
             }
         }
 
-        // Interval update countdown per detik
+        // Interval update countdown per detik untuk memantau waktu habis
         setInterval(() => {
             db.ref('votingConfig').once('value', (snapshot) => {
                 const config = snapshot.val();
@@ -371,15 +382,24 @@
         }
 
         function confirmVote() {
-            db.ref('voters/' + currentUser.nis).set(true).then(() => {
-                db.ref('votes/' + selectedCandidateId).transaction((currentVotes) => {
-                    return (currentVotes || 0) + 1;
-                }, () => {
-                    document.getElementById('success-name').innerText = currentUser.nama;
-                    showPage('success-page');
+            // Pastikan voting masih buka sebelum benar-benar lempar suara ke server
+            db.ref('votingConfig').once('value', (snapshot) => {
+                const config = snapshot.val() || { isOpen: false };
+                if (!config.isOpen) {
+                    alert("Waktu pemilihan telah habis! Gagal mengirim suara.");
+                    return logout();
+                }
+
+                db.ref('voters/' + currentUser.nis).set(true).then(() => {
+                    db.ref('votes/' + selectedCandidateId).transaction((currentVotes) => {
+                        return (currentVotes || 0) + 1;
+                    }, () => {
+                        document.getElementById('success-name').innerText = currentUser.nama;
+                        showPage('success-page');
+                    });
+                }).catch((error) => {
+                    alert("Gagal mengirim suara: " + error.message);
                 });
-            }).catch((error) => {
-                alert("Gagal mengirim suara: " + error.message);
             });
         }
 
@@ -413,11 +433,11 @@
                     winnerBanner.style.background = "#eef2f5";
                     winnerBanner.style.color = "#666";
                 } else if (v1 > v2) {
-                    winnerBanner.innerHTML = "🏆 PASLON 1 SEDANG MEMIMPIN 🏆";
+                    winnerBanner.innerHTML = "🏆 PASLON 1 (SpongeBob & Patrick) MEMIMPIN 🏆";
                     winnerBanner.style.background = "var(--secondary)";
                     winnerBanner.style.color = "var(--primary)";
                 } else if (v2 > v1) {
-                    winnerBanner.innerHTML = "🏆 PASLON 2 SEDANG MEMIMPIN 🏆";
+                    winnerBanner.innerHTML = "🏆 PASLN 2 (Squidward & Krabs) MEMIMPIN 🏆";
                     winnerBanner.style.background = "var(--secondary)";
                     winnerBanner.style.color = "var(--primary)";
                 } else {
@@ -457,7 +477,7 @@
             let endTime = null;
             if (minutes && minutes > 0) {
                 endTime = new Date().getTime() + (minutes * 60 * 1000);
-                alert(`Voting dibuka selama ${minutes} menit!`);
+                alert(`Voting dibuka selama ${minutes} menit! (Akan tertutup otomatis saat waktu habis).`);
             } else {
                 alert("Voting dibuka tanpa batas waktu.");
             }
