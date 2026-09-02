@@ -205,19 +205,19 @@
             { nis: "2026", nama: "Muhtazam Afreza", password: "123" }
         ];
 
-        // --- DATA PASANGAN CALON (Bikini Bottom Edition) ---
+        // --- DATA PASANGAN CALON (Visi Normal, Kelas X A & X B) ---
         const candidates = [
             { 
                 id: 1, label: "Paslon Nomor 1", 
-                ketua: "SpongeBob SquarePants", kelasK: "XI IPA", imgK: "https://i.ibb.co.com/7dZ4g5x/1000924252.jpg",
-                wakil: "Patrick Star", kelasW: "XI IPS", imgW: "https://i.ibb.co.com/93x47w5/1000924251.jpg", 
-                visi: "Mewujudkan lingkungan sekolah yang ceria, penuh kreativitas, dan rajin memproduksi Krabby Patty kebaikan."
+                ketua: "SpongeBob SquarePants", kelasK: "X A", imgK: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=compress&w=300",
+                wakil: "Patrick Star", kelasW: "X A", imgW: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=compress&w=300", 
+                visi: "Mewujudkan OSIS sebagai wadah aspirasi siswa yang aktif, berprestasi, berkarakter, dan berlandaskan kekeluargaan."
             },
             { 
                 id: 2, label: "Paslon Nomor 2", 
-                ketua: "Squidward Tentacles", kelasK: "XII Bahasa", imgK: "https://i.ibb.co.com/84x86s7/1000924268.jpg",
-                wakil: "Tuan Krabs", kelasW: "XII IPA", imgW: "https://i.ibb.co.com/7v5933V/1000924253.jpg", 
-                visi: "Membangun kedisiplinan tingkat tinggi, seni estetika yang elegan, dan manajemen keuangan OSIS yang menguntungkan."
+                ketua: "Squidward Tentacles", kelasK: "X B", imgK: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=compress&w=300",
+                wakil: "Tuan Krabs", kelasW: "X B", imgW: "https://images.unsplash.com/photo-1563089145-599997674d42?auto=compress&w=300", 
+                visi: "Menjadikan lingkungan sekolah yang disiplin, inovatif, serta unggul dalam bidang akademik maupun non-akademik."
             }
         ];
 
@@ -236,7 +236,6 @@
             const config = snapshot.val() || { isOpen: false, endTime: null };
             updateBanner(config);
 
-            // Jika voting ditutup secara otomatis dari sistem (waktu habis) dan user sedang di halaman kandidat, tendang ke login / beri peringatan
             if (!config.isOpen) {
                 const candidatesPage = document.getElementById('candidates-page');
                 const confirmPage = document.getElementById('confirmation-page');
@@ -260,7 +259,6 @@
                 const now = new Date().getTime();
                 const distance = config.endTime - now;
                 if (distance < 0) {
-                    // WAKTU HABIS: Otomatis perbarui database jadi tutup (Auto-Close serentak)
                     db.ref('votingConfig').set({ isOpen: false, endTime: null });
                 } else {
                     const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -277,7 +275,6 @@
             }
         }
 
-        // Interval update countdown per detik untuk memantau waktu habis
         setInterval(() => {
             db.ref('votingConfig').once('value', (snapshot) => {
                 const config = snapshot.val();
@@ -311,7 +308,6 @@
                     return alert("Gagal Login! NIS atau Password tidak terdaftar.");
                 }
 
-                // Cek apakah sudah memilih di database Firebase
                 db.ref('voters/' + nis).once('value', (voterSnapshot) => {
                     if (voterSnapshot.exists()) {
                         return alert(`Maaf ${student.nama}, Anda sudah menggunakan hak suara Anda.`);
@@ -382,7 +378,6 @@
         }
 
         function confirmVote() {
-            // Pastikan voting masih buka sebelum benar-benar lempar suara ke server
             db.ref('votingConfig').once('value', (snapshot) => {
                 const config = snapshot.val() || { isOpen: false };
                 if (!config.isOpen) {
@@ -433,11 +428,11 @@
                     winnerBanner.style.background = "#eef2f5";
                     winnerBanner.style.color = "#666";
                 } else if (v1 > v2) {
-                    winnerBanner.innerHTML = "🏆 PASLON 1 (SpongeBob & Patrick) MEMIMPIN 🏆";
+                    winnerBanner.innerHTML = "🏆 PASLON 1 SEDANG MEMIMPIN 🏆";
                     winnerBanner.style.background = "var(--secondary)";
                     winnerBanner.style.color = "var(--primary)";
                 } else if (v2 > v1) {
-                    winnerBanner.innerHTML = "🏆 PASLN 2 (Squidward & Krabs) MEMIMPIN 🏆";
+                    winnerBanner.innerHTML = "🏆 PASLON 2 SEDANG MEMIMPIN 🏆";
                     winnerBanner.style.background = "var(--secondary)";
                     winnerBanner.style.color = "var(--primary)";
                 } else {
