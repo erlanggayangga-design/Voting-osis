@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Voting OSIS SNT</title>
+    <title>E-Voting OSIS SNT - Realtime</title>
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Firebase App & Realtime Database SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
     <style>
         :root {
             --primary: #1E3E62; /* Navy Blue */
@@ -87,7 +92,6 @@
 <body>
 
     <header>
-        <!-- Logo Resmi Pendidikan / SNT -->
         <img src="https://upload.wikimedia.org/wikipedia/commons/9/9c/Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg" alt="Logo SNT" class="school-logo">
         <h1>Sekolah Nasional Terintegrasi</h1>
         <p>Pemilihan Ketua & Wakil OSIS Periode 2026/2027</p>
@@ -165,11 +169,7 @@
                 </div>
             </div>
 
-            <div style="text-align: right; margin-bottom: 10px;">
-                <button class="btn btn-gold" style="width: auto; padding: 8px 15px;" onclick="renderAdmin()">🔄 Refresh Hasil</button>
-            </div>
-
-            <div style="width: 100%; max-width: 400px; margin: 0 auto;">
+            <div style="width: 100%; max-width: 400px; margin: 20px auto 0 auto;">
                 <canvas id="voteChart"></canvas>
             </div>
             
@@ -179,6 +179,22 @@
     </div>
 
     <script>
+        // --- KONFIGURASI FIREBASE ANDA ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAjCJV16zCiOh764X4xoLUwbH58eKoIItI",
+            authDomain: "vote-ketos-54b38.firebaseapp.com",
+            databaseURL: "https://vote-ketos-54b38-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "vote-ketos-54b38",
+            storageBucket: "vote-ketos-54b38.firebasestorage.app",
+            messagingSenderId: "657876004266",
+            appId: "1:657876004266:web:1311adce3ba3d9c6170fd3",
+            measurementId: "G-QP1K6R4E6T"
+        };
+
+        // Inisialisasi Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         // --- DATA DUMMY SISWA ---
         const registeredStudents = [
             { nis: "1001", nama: "Budi Santoso", password: "123" },
@@ -189,7 +205,7 @@
             { nis: "2026", nama: "Muhtazam Afreza", password: "123" }
         ];
 
-        // --- DATA PASANGAN CALON (Kelas X A & X B) ---
+        // --- DATA PASANGAN CALON ---
         const candidates = [
             { 
                 id: 1, label: "Paslon Nomor 1", 
@@ -205,36 +221,24 @@
             }
         ];
 
-        // --- INISIALISASI LOCAL STORAGE ---
-        if (!localStorage.getItem('votes')) localStorage.setItem('votes', JSON.stringify({1: 0, 2: 0}));
-        if (!localStorage.getItem('voters')) localStorage.setItem('voters', JSON.stringify([]));
-        if (!localStorage.getItem('votingConfig')) {
-            localStorage.setItem('votingConfig', JSON.stringify({ isOpen: false, endTime: null }));
-        }
-
         let currentUser = null; 
         let selectedCandidateId = null;
         let chartInstance = null;
-        let countdownInterval = null;
 
-        // --- FUNGSI GLOBAL ---
         function showPage(pageId) {
             document.querySelectorAll('.box').forEach(box => box.classList.add('hidden'));
             document.getElementById(pageId).classList.remove('hidden');
             window.scrollTo(0, 0);
         }
 
-        // --- SISTEM COUNTDOWN & STATUS ---
-        function startTimer() {
-            if (countdownInterval) clearInterval(countdownInterval);
-            countdownInterval = setInterval(updateBanner, 1000);
-            updateBanner();
-        }
+        // --- REALTIME LISTENER STATUS VOTING ---
+        db.ref('votingConfig').on('value', (snapshot) => {
+            const config = snapshot.val() || { isOpen: false, endTime: null };
+            updateBanner(config);
+        });
 
-        function updateBanner() {
-            const config = JSON.parse(localStorage.getItem('votingConfig'));
+        function updateBanner(config) {
             const banner = document.getElementById('countdown-banner');
-            
             if (!config.isOpen) {
                 banner.style.background = "var(--danger)";
                 banner.style.color = "white";
@@ -245,13 +249,8 @@
             if (config.endTime) {
                 const now = new Date().getTime();
                 const distance = config.endTime - now;
-
                 if (distance < 0) {
-                    config.isOpen = false;
-                    localStorage.setItem('votingConfig', JSON.stringify(config));
-                    banner.style.background = "var(--danger)";
-                    banner.style.color = "white";
-                    banner.innerText = "WAKTU HABIS - VOTING DITUTUP";
+                    db.ref('votingConfig').set({ isOpen: false, endTime: null });
                 } else {
                     const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                     const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
@@ -267,45 +266,54 @@
             }
         }
 
-        // --- FUNGSI LOGIN & VALIDASI ---
+        // Interval update countdown per detik
+        setInterval(() => {
+            db.ref('votingConfig').once('value', (snapshot) => {
+                const config = snapshot.val();
+                if (config && config.isOpen && config.endTime) {
+                    updateBanner(config);
+                }
+            });
+        }, 1000);
+
+        // --- FUNGSI LOGIN ---
         function login() {
             const nis = document.getElementById('nis').value.trim();
             const pass = document.getElementById('password').value.trim();
-            const config = JSON.parse(localStorage.getItem('votingConfig'));
 
             if (!nis || !pass) return alert("NIS dan Password wajib diisi!");
 
             // Bypass Admin
             if (nis === 'admin' && pass === 'admin123') {
-                renderAdmin();
                 showPage('admin-page');
                 return;
             }
 
-            // Validasi Status Voting
-            if (!config.isOpen) {
-                return alert("Mohon maaf, sesi voting saat ini sedang DITUTUP oleh panitia.");
-            }
+            db.ref('votingConfig').once('value', (snapshot) => {
+                const config = snapshot.val() || { isOpen: false };
+                if (!config.isOpen) {
+                    return alert("Mohon maaf, sesi voting saat ini sedang DITUTUP oleh panitia.");
+                }
 
-            // Validasi Data Siswa
-            const student = registeredStudents.find(s => s.nis === nis && s.password === pass);
-            if (!student) {
-                return alert("Gagal Login! NIS atau Password tidak terdaftar.");
-            }
+                const student = registeredStudents.find(s => s.nis === nis && s.password === pass);
+                if (!student) {
+                    return alert("Gagal Login! NIS atau Password tidak terdaftar.");
+                }
 
-            // Validasi Sudah Memilih
-            const voters = JSON.parse(localStorage.getItem('voters'));
-            if (voters.includes(nis)) {
-                return alert(`Maaf ${student.nama}, Anda sudah menggunakan hak suara Anda.`);
-            }
+                // Cek apakah sudah memilih di database Firebase
+                db.ref('voters/' + nis).once('value', (voterSnapshot) => {
+                    if (voterSnapshot.exists()) {
+                        return alert(`Maaf ${student.nama}, Anda sudah menggunakan hak suara Anda.`);
+                    }
 
-            currentUser = student;
-            document.getElementById('welcome-msg').innerText = `👋 Selamat Datang, ${student.nama}`;
-            renderCandidates();
-            showPage('candidates-page');
+                    currentUser = student;
+                    document.getElementById('welcome-msg').innerText = `👋 Selamat Datang, ${student.nama}`;
+                    renderCandidates();
+                    showPage('candidates-page');
+                });
+            });
         }
 
-        // --- FUNGSI RENDER CALON ---
         function renderCandidates() {
             const container = document.getElementById('candidates-list');
             container.innerHTML = '';
@@ -338,7 +346,6 @@
             });
         }
 
-        // --- FUNGSI KONFIRMASI ---
         function prepareConfirm(id) {
             selectedCandidateId = id;
             const c = candidates.find(x => x.id === id);
@@ -364,52 +371,63 @@
         }
 
         function confirmVote() {
-            const votes = JSON.parse(localStorage.getItem('votes'));
-            const voters = JSON.parse(localStorage.getItem('voters'));
-
-            votes[selectedCandidateId] += 1;
-            voters.push(currentUser.nis);
-
-            localStorage.setItem('votes', JSON.stringify(votes));
-            localStorage.setItem('voters', JSON.stringify(voters));
-
-            document.getElementById('success-name').innerText = currentUser.nama;
-            showPage('success-page');
+            db.ref('voters/' + currentUser.nis).set(true).then(() => {
+                db.ref('votes/' + selectedCandidateId).transaction((currentVotes) => {
+                    return (currentVotes || 0) + 1;
+                }, () => {
+                    document.getElementById('success-name').innerText = currentUser.nama;
+                    showPage('success-page');
+                });
+            }).catch((error) => {
+                alert("Gagal mengirim suara: " + error.message);
+            });
         }
 
-        // --- FUNGSI ADMIN PANELS ---
-        function renderAdmin() {
-            const votes = JSON.parse(localStorage.getItem('votes'));
-            const voters = JSON.parse(localStorage.getItem('voters'));
-            
-            const totalSiswa = registeredStudents.length;
-            const sudahMilih = voters.length;
-            const belumMilih = totalSiswa - sudahMilih;
-
-            document.getElementById('stat-total').innerText = totalSiswa;
-            document.getElementById('stat-voted').innerText = sudahMilih;
-            document.getElementById('stat-unvoted').innerText = belumMilih;
-
-            const winnerBanner = document.getElementById('admin-winner');
-            if (votes[1] === 0 && votes[2] === 0) {
-                winnerBanner.innerHTML = "📊 Belum ada suara yang masuk.";
-                winnerBanner.style.background = "#eef2f5";
-                winnerBanner.style.color = "#666";
-            } else if (votes[1] > votes[2]) {
-                winnerBanner.innerHTML = "🏆 PASLON 1 SEDANG MEMIMPIN 🏆";
-                winnerBanner.style.background = "var(--secondary)";
-                winnerBanner.style.color = "var(--primary)";
-            } else if (votes[2] > votes[1]) {
-                winnerBanner.innerHTML = "🏆 PASLON 2 SEDANG MEMIMPIN 🏆";
-                winnerBanner.style.background = "var(--secondary)";
-                winnerBanner.style.color = "var(--primary)";
-            } else {
-                winnerBanner.innerHTML = "⚖️ KEDUDUKAN SEMENTARA IMBANG ⚖️";
-                winnerBanner.style.background = "#17a2b8";
-                winnerBanner.style.color = "white";
+        // --- REALTIME ADMIN PANEL LISTENER ---
+        db.ref().on('value', () => {
+            if (!document.getElementById('admin-page').classList.contains('hidden')) {
+                renderAdminData();
             }
+        });
 
-            renderChart(votes[1], votes[2]);
+        function renderAdminData() {
+            db.ref().once('value', (snapshot) => {
+                const data = snapshot.val() || {};
+                const votes = data.votes || { 1: 0, 2: 0 };
+                const voters = data.voters ? Object.keys(data.voters) : [];
+                
+                const totalSiswa = registeredStudents.length;
+                const sudahMilih = voters.length;
+                const belumMilih = totalSiswa - sudahMilih;
+
+                document.getElementById('stat-total').innerText = totalSiswa;
+                document.getElementById('stat-voted').innerText = sudahMilih;
+                document.getElementById('stat-unvoted').innerText = belumMilih;
+
+                const v1 = votes[1] || 0;
+                const v2 = votes[2] || 0;
+
+                const winnerBanner = document.getElementById('admin-winner');
+                if (v1 === 0 && v2 === 0) {
+                    winnerBanner.innerHTML = "📊 Belum ada suara yang masuk.";
+                    winnerBanner.style.background = "#eef2f5";
+                    winnerBanner.style.color = "#666";
+                } else if (v1 > v2) {
+                    winnerBanner.innerHTML = "🏆 PASLON 1 SEDANG MEMIMPIN 🏆";
+                    winnerBanner.style.background = "var(--secondary)";
+                    winnerBanner.style.color = "var(--primary)";
+                } else if (v2 > v1) {
+                    winnerBanner.innerHTML = "🏆 PASLON 2 SEDANG MEMIMPIN 🏆";
+                    winnerBanner.style.background = "var(--secondary)";
+                    winnerBanner.style.color = "var(--primary)";
+                } else {
+                    winnerBanner.innerHTML = "⚖️ KEDUDUKAN SEMENTARA IMBANG ⚖️";
+                    winnerBanner.style.background = "#17a2b8";
+                    winnerBanner.style.color = "white";
+                }
+
+                renderChart(v1, v2);
+            });
         }
 
         function renderChart(v1, v2) {
@@ -443,14 +461,12 @@
             } else {
                 alert("Voting dibuka tanpa batas waktu.");
             }
-            localStorage.setItem('votingConfig', JSON.stringify({ isOpen: true, endTime: endTime }));
-            updateBanner();
+            db.ref('votingConfig').set({ isOpen: true, endTime: endTime });
         }
 
         function closeVoting() {
-            localStorage.setItem('votingConfig', JSON.stringify({ isOpen: false, endTime: null }));
+            db.ref('votingConfig').set({ isOpen: false, endTime: null });
             alert("Voting berhasil DITUTUP.");
-            updateBanner();
         }
 
         function logout() {
@@ -462,20 +478,25 @@
         }
 
         function resetData() {
-            if(confirm("PERINGATAN! Ini akan menghapus seluruh data suara. Lanjutkan?")) {
+            if(confirm("PERINGATAN! Ini akan menghapus seluruh data suara di server. Lanjutkan?")) {
                 let doubleCheck = prompt("Ketik 'RESET' untuk mengonfirmasi penghapusan:");
                 if (doubleCheck === 'RESET') {
-                    localStorage.setItem('votes', JSON.stringify({1: 0, 2: 0}));
-                    localStorage.setItem('voters', JSON.stringify([]));
-                    renderAdmin();
-                    alert("Seluruh data voting telah direset dari nol.");
+                    db.ref('votes').set({ 1: 0, 2: 0 });
+                    db.ref('voters').remove();
+                    alert("Seluruh data voting telah direset dari server.");
                 } else {
                     alert("Reset dibatalkan.");
                 }
             }
         }
 
-        startTimer();
+        const originalShowPage = showPage;
+        showPage = function(pageId) {
+            originalShowPage(pageId);
+            if(pageId === 'admin-page') {
+                renderAdminData();
+            }
+        }
     </script>
 </body>
 </html>
