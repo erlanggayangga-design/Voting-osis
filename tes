@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRA-STUDI KU</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-main: #2b2d42;
+            --text-muted: #8d99ae;
+            --border-color: #e9ecef;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --locked: #6c757d;
+        }
+
+        .dark-mode {
+            --primary: #4cc9f0;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #f8f9fa;
+            --text-muted: #adb5bd;
+            --border-color: #343a40;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            color: var(--text-main);
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow-x: hidden;
+        }
+
+        .hidden { display: none !important; }
+
+        /* === HALAMAN LOGIN === */
+        #login-view {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            padding: 35px 25px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .school-logo-container {
+            width: 75px;
+            height: 75px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 15px auto;
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.35);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .school-logo-container svg {
+            width: 40px;
+            height: 40px;
+            fill: white;
+        }
+
+        .login-title {
+            color: var(--text-main);
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .login-subtitle {
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 13px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--bg-color);
+            color: var(--text-main);
+            outline: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-success {
+            background-color: #2ec4b6 !important;
+        }
+
+        .text-link {
+            display: block;
+            margin-top: 18px;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .text-link:hover {
+            text-decoration: underline;
+        }
+
+        /* === GLOBAL LAYOUT === */
+        .top-bar {
+            background-color: var(--card-bg);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid var(--border-color);
+            z-index: 10;
+        }
+        .nav-item {
+            text-align: center;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+        .nav-item.active {
+            color: var(--primary);
+        }
+        .nav-item span {
+            display: block;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .page-content {
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+        .card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+        
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .menu-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 20px 10px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text-main);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            position: relative;
+        }
+        .menu-btn i {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .module-title { margin-bottom: 20px; }
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .list-item:last-child { border: none; }
+        .badge {
+            background: var(--primary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .modal-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 420px;
+            max-height: 85vh;
+            overflow-y: auto;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+
+    <!-- HALAMAN LOGIN -->
+    <div id="login-view">
+        <div class="login-card">
+            <div class="school-logo-container">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+                </svg>
+            </div>
+            
+            <h2 class="login-title">PRA-STUDI KU</h2>
+            <p class="login-subtitle">Sekolah Nasional Terintegrasi</p>
+            
+            <p style="margin-bottom: 20px; font-weight: 600; font-size: 14px; color: var(--text-main);">Masuk untuk mengisi jurnal.</p>
+            
+            <div class="input-group">
+                <label>Kode Siswa / Guru</label>
+                <input type="text" id="input-kode" placeholder="Contoh: PS001 atau GURU01">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="input-pass" placeholder="Masukkan sandi">
+            </div>
+            <button class="btn-primary" onclick="doLogin()">MASUK</button>
+            <a href="#" class="text-link">Lupa Password? Hubungi Administrator</a>
+        </div>
+    </div>
+
+    <!-- MAIN APP VIEW (SISWA) -->
+    <div id="main-view" class="hidden">
+        <div class="top-bar">
+            <div style="font-weight: bold;">PRA-STUDI KU</div>
+            <div>
+                <span onclick="openNotificationModal()" style="cursor:pointer; font-size: 18px;" title="Pengumuman">🔔</span>
+            </div>
+        </div>
+
+        <div id="content-area" class="page-content">
+
+            <!-- BERANDA (DASBOR) -->
+            <div id="page-home">
+                <div class="card">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="font-size: 40px;">👨‍🎓</div>
+                        <div>
+                            <h3 id="user-name-home">Halo, Siswa</h3>
+                            <p style="font-size: 14px; color: var(--text-muted);">Sistem Jurnal Terintegrasi</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="notif-banner" class="card hidden" style="background-color: #e8f4f8; color: #1d3557; border-left: 4px solid var(--primary);">
+                    <strong>📢 Pengumuman Guru:</strong>
+                    <p id="notif-text-preview" style="font-size: 13px; margin-top: 3px;"></p>
+                </div>
+
+                <div class="card" style="display: flex; justify-content: space-around; text-align: center;">
+                    <div><h2 id="status-count" style="color: var(--primary);">0/6</h2><p style="font-size: 12px;">Progress Modul</p></div>
+                    <div><h2 id="status-text" style="color: var(--warning);">Belum Final</h2><p style="font-size: 12px;">Status</p></div>
+                </div>
+
+                <div id="locked-banner" class="card hidden" style="background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; text-align: center; font-weight: bold;">
+                    🔒 Jurnal Anda sudah dikirim dan dikunci permanen.<br>
+                    <span id="submit-timestamp" style="font-size: 11px; font-weight: normal; display: block; margin-top: 4px;"></span>
+                </div>
+
+                <h4 style="margin: 20px 0 10px 0;">Menu Modul Jurnal & Aktivitas</h4>
+                <div class="menu-grid">
+                    <div class="menu-btn" onclick="openModule('mod-jurnal')"><i id="icon-m1">📝</i>Jurnal Diri</div>
+                    <div class="menu-btn" onclick="openModule('mod-literasi')"><i id="icon-m2">📚</i>Literasi</div>
+                    <div class="menu-btn" onclick="openModule('mod-numerasi')"><i id="icon-m3">🔢</i>Numerasi</div>
+                    <div class="menu-btn" onclick="openModule('mod-target')"><i id="icon-m4">🎯</i>Target Belajar</div>
+                    <div class="menu-btn" onclick="openModule('mod-waktu')"><i id="icon-m5">⏰</i>Manajemen Waktu</div>
+                    <div class="menu-btn" onclick="openModule('mod-lingkungan')"><i id="icon-m6">🏫</i>Lapor Lingkungan</div>
+                </div>
+
+                <div id="submit-section" style="margin-top: 25px;">
+                    <button id="btn-main-submit" class="btn-primary btn-success" onclick="confirmSubmit()">🚀 KIRIM JURNAL KESELURUHAN (FINAL)</button>
+                    <p style="font-size: 11px; text-align: center; color: var(--text-muted); margin-top: 8px;">Pastikan semua modul sudah diisi. Anda bebas mengedit sebelum mengirim final.</p>
+                </div>
+            </div>
+
+            <!-- RIWAYAT & RAPOR -->
+            <div id="page-history" class="hidden">
+                <h2>🕒 Riwayat & Catatan Guru</h2>
+                <div class="card" style="margin-top: 15px;">
+                    <div class="list-item">
+                        <div><strong>Status Pengiriman</strong><br><span style="font-size:12px;" id="history-status-desc">Belum Mengisi</span></div>
+                        <span class="badge" id="history-badge" style="background:var(--warning)">Belum</span>
+                    </div>
+                    <div class="list-item">
+                        <div><strong>Waktu Dibuat / Diperbarui</strong><br><span style="font-size:12px;" id="history-created-time">-</span></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>⭐ Penilaian Guru</h4>
+                    <div id="student-grades-view" style="font-size: 14px; margin-top: 8px; color: var(--text-muted);">
+                        Belum ada penilaian dari guru.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>📝 Catatan / Ulasan Guru</h4>
+                    <p id="student-notes-view" style="font-size: 14px; margin-top:5px; color: var(--text-muted);">Belum ada catatan.</p>
+                </div>
+            </div>
+
+            <!-- PROFIL -->
+            <div id="page-profile" class="hidden">
+                <h2>👤 Profil Saya</h2>
+                <div class="card" style="text-align: center; margin-top: 15px;">
+                    <div style="font-size: 60px;">👨‍🎓</div>
+                    <h3 id="user-name-profile">Nama Siswa</h3>
+                    <p id="user-nis-profile" style="color: var(--text-muted);">NIS: - | Kelas: X-A</p>
+                </div>
+
+                <h4 style="margin: 15px 0 10px;">Pengaturan</h4>
+                <div class="card">
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="theme-toggle" onchange="toggleTheme()" style="width:auto;">
+                        <label for="theme-toggle">Ganti Tema (Gelap/Terang)</label>
+                    </div>
+                    <button class="btn-primary" style="background-color: var(--border-color); color: var(--text-main); margin-bottom:10px;">Ganti Kata Sandi</button>
+                    <button class="btn-primary" style="background-color: var(--warning);" onclick="doLogout()">Keluar (Logout)</button>
+                </div>
+            </div>
+
+            <!-- MODUL FORM -->
+            <div id="mod-jurnal" class="hidden module-page">
+                <button class="back-btn" onclick="closeModule()">← Kembali ke Beranda</button>
+                <h2 class="module-title">📝 Jurnal Diri</h2>
+                <div class="card">
+                    <div class="input-group"><label>Perasaan hari ini</label><select id="inp-jurnal-perasaan" oninput="autoSave()"><option>Senang</option><option>Semangat</option><option>Biasa aja</option><option>Lelah</option><option>Sedih</option></select></div>
+                    <div class="input-group"><label>Kegiatan hari ini</label><textarea id="inp-jurnal-kegiatan" rows="3" placeholder="Apa saja yang kamu lakukan hari ini?" oninput="autoSave()"></textarea></div>
+                    <div class="input-group"><label>Yang dipelajari</label><textarea id="inp-jurnal-belajar" rows="3" placeholder="Apa yang saya pelajari?" oninput="autoSave()"></textarea></div>
+                    <div class="input-group"><label>Refleksi</label><textarea id="inp-jurnal-refleksi" rows="2" placeholder="Apa yang ingin saya perbaiki?" oninput="autoSave()"></textarea></div>
+                    <button class="btn-primary" onclick="closeModule()">SIMPAN & KEMBALI</button>
+                </div>
+            </div>
+
+            <div id="mod-literasi" class="hidden module-page">
+                <button class="back-btn" onclick="closeModule()">← Kembali ke Beranda</button>
+                <h2 class="module-title">📚 Latihan Literasi</h2>
+                <div class="card">
+                    <div class="input-group"><label>Judul Bacaan</label><input type="text" id="inp-lit-judul" placeholder="Masukkan judul bacaan" oninput="autoSave()"></div>
+                    <div class="input-group"><label>Sumber</label><input type="text" id="inp-lit-sumber" placeholder="Buku / Artikel / Website" oninput="autoSave()"></div>
+                    <div class="input-group"><label>Ringkasan</label><textarea id="inp-lit-ringkasan" rows="4" placeholder="Tuliskan ringkasan..." oninput="autoSave()"></textarea></div>
+                    <div class="input-group"><label>Refleksi</label><textarea id="inp-lit-refleksi" rows="3" placeholder="Apa hal penting yang kamu dapat?" oninput="autoSave()"></textarea></div>
+                    <button class="btn-primary" onclick="closeModule()">SIMPAN & KEMBALI</button>
+                </div>
+            </div>
+
+            <div id="mod-numerasi" class="hidden module-page">
+                <button class="back-btn" onclick="closeModule()">← Kembali ke Beranda</button>
+                <h2 class="module-title">🔢 Latihan Numerasi</h2>
+                <div class="card">
+                    <div class="input-group"><label>Topik</label><input type="text" id="inp-num-topik" placeholder="Contoh: Persentase" oninput="autoSave()"></div>
+                    <div class="input-group"><label>Soal</label><textarea id="inp-num-soal" rows="2" placeholder="Tulis soal..." oninput="autoSave()"></textarea></div>
+                    <div class="input-group"><label>Jawaban Akhir</label><input type="text" id="inp-num-jawaban" placeholder="Hasil akhir" oninput="autoSave()"></div>
+                    <div class="input-group"><label>Cara Menyelesaikan</label><textarea id="inp-num-cara" rows="4" placeholder="Jelaskan langkah-langkah..." oninput="autoSave()"></textarea></div>
+                    <button class="btn-primary" onclick="closeModule()">SIMPAN & KEMBALI</button>
+                </div>
+            </div>
+
+            <div id="mod-target" class="hidden module-page">
+                <button class="back-btn" onclick="closeModule()">← Kembali ke Beranda</button>
+                <h2 class="module-title">🎯 Target Belajar</h2>
+                <div class="card">
+                    <div class="input-group"><label>Target Belajar</label><textarea id="inp-target-teks" rows="3" placeholder="Contoh: Menyelesaikan 20 soal matematika..." oninput="autoSave()"></textarea></div>
+                    <div class="input-group"><label>Batas Waktu</label><input type="date" id="inp-target-waktu" oninput="autoSave()"></div>
+                    <button class="btn-primary" onclick="closeModule()">SIMPAN & KEMBALI</button>
+                </div>
+            </div>
+
+            <div id="mod-waktu" class="hidden module-page">
+                <button class="back-btn" onclick="closeModule()">← Kembali ke Beranda</button>
+                <h2 class="module-title">⏰ Manajemen Waktu</h2>
+                <div class="card">
+                    <div class="input-group"><label>Kegiatan</label><input type="text" id="inp-waktu-kegiatan" placeholder="Contoh: Belajar Bahasa Inggris" oninput="autoSave()"></div>
+                    <div style="display: flex; gap: 10px;">
+                        <div class="input-group" style="flex: 1;"><label>Mulai</label><input type="time" id="inp-waktu-mulai" oninput="autoSave()"></div>
+                        <div class="input-group" style="flex: 1;"><label>Selesai</label><input type="time" id="inp-waktu-selesai" oninput="autoSave()"></div>
+                    </div>
+                    <div class="input-group"><label>Keterangan</label><textarea id="inp-waktu-ket" rows="2" placeholder="Catatan..." oninput="autoSave()"></textarea></div>
+                    <div class="toggle-switch"><input type="checkbox" id="inp-waktu-ingat" style="width: auto;" onchange="autoSave()"><label for="inp-waktu-ingat">Aktifkan Pengingat</label></div>
+                    <button class="btn-primary" onclick="closeModule()">SIMPAN & KEMBALI</button>
+                </div>
+            </div>
+
+            <div id="mod-lingkungan" class="hidden module-page">
+                <button class="back-btn" onclick="closeModule()">← Kembali ke Beranda</button>
+                <h2 class="module-title">🏫 Lapor Lingkungan</h2>
+                <div class="card">
+                    <div class="input-group"><label>Kategori</label><select id="inp-ling-kat" oninput="autoSave()"><option>Kebersihan</option><option>Fasilitas</option><option>Keamanan</option><option>Kedisiplinan</option><option>Kenyamanan</option><option>Lainnya</option></select></div>
+                    <div class="input-group"><label>Lokasi</label><input type="text" id="inp-ling-lokasi" placeholder="Contoh: Perpustakaan" oninput="autoSave()"></div>
+                    <div class="input-group"><label>Laporan</label><textarea id="inp-ling-laporan" rows="3" placeholder="Apa yang kamu temukan?" oninput="autoSave()"></textarea></div>
+                    <div class="input-group"><label>Tindakan / Saran</label><textarea id="inp-ling-saran" rows="2" placeholder="Saran perbaikan..." oninput="autoSave()"></textarea></div>
+                    <button class="btn-primary" onclick="closeModule()">SIMPAN & KEMBALI</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MODAL KONFIRMASI KIRIM -->
+        <div id="confirm-modal" class="modal-overlay hidden">
+            <div class="modal-card" style="text-align: center;">
+                <h3 style="margin-bottom: 10px; color: var(--warning);">⚠️ Konfirmasi Pengiriman Final</h3>
+                <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">Apakah kamu yakin ingin mengirim jurnal sekarang? Setelah dikirim, data akan dikunci permanen dan tidak dapat diubah kembali.</p>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-primary" style="background-color: var(--border-color); color: var(--text-main);" onclick="closeModal()">Batal</button>
+                    <button class="btn-primary" style="background-color: var(--success);" onclick="executeSubmit()">Ya, Kirim</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL NOTIFIKASI PENGUMUMAN -->
+        <div id="notification-modal" class="modal-overlay hidden">
+            <div class="modal-card">
+                <h3 style="margin-bottom: 15px; color: var(--primary);">🔔 Pengumuman Guru</h3>
+                <p id="modal-notif-body" style="font-size: 14px; line-height: 1.6; margin-bottom: 20px;">Belum ada pengumuman baru dari guru.</p>
+                <button class="btn-primary" onclick="closeNotificationModal()">Tutup</button>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAVIGATION -->
+        <div id="bottom-nav" class="bottom-nav">
+            <div class="nav-item active" onclick="switchNav('page-home', this)">🏠<span>Beranda</span></div>
+            <div class="nav-item" onclick="switchNav('page-history', this)">🕒<span>Riwayat</span></div>
+            <div class="nav-item" onclick="switchNav('page-profile', this)">👤<span>Profil</span></div>
+        </div>
+    </div>
+
+    <!-- ADMIN / GURU VIEW -->
+    <div id="admin-view" class="hidden">
+        <div class="top-bar">
+            <div style="font-weight: bold; color: var(--primary);">👨‍🏫 Panel Guru / Admin</div>
+            <button onclick="doLogout()" style="background: var(--warning); color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;">Keluar</button>
+        </div>
+
+        <div class="page-content">
+            <div class="card">
+                <h3 id="admin-name">Selamat Datang, Guru</h3>
+                <p style="font-size: 14px; color: var(--text-muted); margin-top: 5px;">Panel Tinjauan & Statistik Jurnal Siswa</p>
+            </div>
+
+            <!-- DASHBOARD STATISTIK -->
+            <div class="card">
+                <h4 style="margin-bottom: 10px;">📊 Statistik Kelas</h4>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px;"><span>Total Siswa:</span><strong id="stat-total">20</strong></div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px;"><span>Sudah Mengisi:</span><strong id="stat-submitted" style="color:var(--success);">0</strong></div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px;"><span>Belum Mengisi:</span><strong id="stat-unsubmitted" style="color:var(--warning);">20</strong></div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px;"><span>Persentase:</span><strong id="stat-percent">0%</strong></div>
+            </div>
+
+            <!-- PENGATURAN PENGUMUMAN -->
+            <div class="card">
+                <h4 style="margin-bottom: 10px;">📢 Buat Pengumuman Kelas</h4>
+                <div class="input-group">
+                    <textarea id="admin-broadcast-input" rows="2" placeholder="Contoh: Jangan lupa mengisi jurnal sebelum Jumat..."></textarea>
+                </div>
+                <button class="btn-primary" style="margin-top:0;" onclick="saveAdminBroadcast()">Siarkan Pengumuman</button>
+            </div>
+
+            <!-- SEARCH & FILTER -->
+            <div class="card">
+                <div class="input-group" style="margin-bottom: 10px;">
+                    <input type="text" id="admin-search" placeholder="Cari nama atau NIS siswa..." oninput="filterAdminList()">
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <select id="admin-filter-status" onchange="filterAdminList()" style="flex:1;">
+                        <option value="all">Semua Status</option>
+                        <option value="submitted">Sudah</option>
+                        <option value="unsubmitted">Belum</option>
+                    </select>
+                    <select id="admin-filter-class" onchange="filterAdminList()" style="flex:1;">
+                        <option value="X-A">Kelas X-A</option>
+                        <option value="X-B">Kelas X-B</option>
+                    </select>
+                </div>
+            </div>
+
+            <h4 style="margin: 20px 0 10px 0;">Daftar Siswa & Status Jurnal</h4>
+            <div class="card" id="admin-student-list">
+                <!-- Diisi dinamis -->
+            </div>
+
+            <h4 style="margin: 20px 0 10px 0;">Unduh Data</h4>
+            <div class="card">
+                <button class="btn-primary" style="margin-bottom: 10px;" onclick="downloadAllRekap()">Unduh Rekap (CSV)</button>
+                <button class="btn-primary" style="background-color: var(--secondary);" onclick="alert('Fitur cetak PDF siap diintegrasikan')">Unduh Rekap (PDF)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETAIL JURNAL & PENILAIAN GURU -->
+    <div id="detail-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3 id="detail-modal-title" style="margin-bottom: 15px; color: var(--primary);">Detail Jurnal Siswa</h3>
+            <div id="detail-modal-content" style="font-size: 14px; line-height: 1.6; max-height: 40vh; overflow-y: auto; margin-bottom: 15px;">
+                <!-- Konten Rincian -->
+            </div>
+
+            <hr style="border:0; border-top:1px solid var(--border-color); margin: 15px 0;">
+
+            <h4 style="margin-bottom: 10px;">⭐ Penilaian Modul (0-100)</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                <div class="input-group" style="margin:0;"><label style="font-size:12px;">Jurnal Diri</label><input type="number" id="grade-jurnal" min="0" max="100"></div>
+                <div class="input-group" style="margin:0;"><label style="font-size:12px;">Literasi</label><input type="number" id="grade-literasi" min="0" max="100"></div>
+                <div class="input-group" style="margin:0;"><label style="font-size:12px;">Numerasi</label><input type="number" id="grade-numerasi" min="0" max="100"></div>
+                <div class="input-group" style="margin:0;"><label style="font-size:12px;">Target Belajar</label><input type="number" id="grade-target" min="0" max="100"></div>
+            </div>
+
+            <div class="input-group">
+                <label>Catatan / Ulasan untuk Siswa</label>
+                <textarea id="admin-teacher-note" rows="2" placeholder="Contoh: Refleksinya sudah bagus, pertahankan..."></textarea>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn-primary" style="background-color: var(--border-color); color: var(--text-main); margin-top:0;" onclick="closeDetailModal()">Tutup</button>
+                <button class="btn-primary" style="background-color: var(--success); margin-top:0;" onclick="saveTeacherGrading()">Simpan Nilai & Catatan</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const dataSiswa = [
+        { kode: "PS001", pass: "123456", nama: "Andi Saputra", kelas: "X-A" },
+        { kode: "PS002", pass: "123456", nama: "Budi Santoso", kelas: "X-A" },
+        { kode: "PS003", pass: "123456", nama: "Citra Lestari", kelas: "X-A" },
+        { kode: "PS004", pass: "123456", nama: "Dewi Maharani", kelas: "X-A" },
+        { kode: "PS005", pass: "123456", nama: "Eko Prasetyo", kelas: "X-B" },
+        { kode: "PS006", pass: "123456", nama: "Fitriani", kelas: "X-B" },
+        { kode: "PS007", pass: "123456", nama: "Gilang Ramadhan", kelas: "X-B" },
+        { kode: "PS008", pass: "123456", nama: "Hendra Wijaya", kelas: "X-B" },
+        { kode: "PS009", pass: "123456", nama: "Intan Permata", kelas: "X-A" },
+        { kode: "PS010", pass: "123456", nama: "Joko Susanto", kelas: "X-A" },
+        { kode: "PS011", pass: "123456", nama: "Kartika Putri", kelas: "X-A" },
+        { kode: "PS012", pass: "123456", nama: "Lukman Hakim", kelas: "X-A" },
+        { kode: "PS013", pass: "123456", nama: "Muhammad Rizky", kelas: "X-B" },
+        { kode: "PS014", pass: "123456", nama: "Nurul Huda", kelas: "X-B" },
+        { kode: "PS015", pass: "123456", nama: "Oki Darmawan", kelas: "X-B" },
+        { kode: "PS016", pass: "123456", nama: "Putri Amelia", kelas: "X-B" },
+        { kode: "PS017", pass: "123456", nama: "Qori Rachman", kelas: "X-A" },
+        { kode: "PS018", pass: "123456", nama: "Rina Marlina", kelas: "X-A" },
+        { kode: "PS019", pass: "123456", nama: "Surya Pratama", kelas: "X-B" },
+        { kode: "PS020", pass: "123456", nama: "Tiara Andini", kelas: "X-B" }
+    ];
+
+    const dataGuru = [
+        { kode: "GURU01", pass: "guru123", nama: "Bu Ani (Wali Kelas)" },
+        { kode: "ADMIN01", pass: "admin123", nama: "Administrator Sistem" }
+    ];
+
+    let currentStudentCode = null;
+    let viewingStudentCode = null;
+
+    function doLogin() {
+        const inputKode = document.getElementById('input-kode').value.toUpperCase();
+        const inputPass = document.getElementById('input-pass').value;
+
+        const guruDitemukan = dataGuru.find(g => g.kode === inputKode && g.pass === inputPass);
+        if (guruDitemukan) {
+            document.getElementById('admin-name').innerText = "Selamat Datang, " + guruDitemukan.nama;
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('admin-view').classList.remove('hidden');
+            loadAdminDashboard();
+            resetLoginForm();
+            return;
+        }
+
+        const siswaDitemukan = dataSiswa.find(s => s.kode === inputKode && s.pass === inputPass);
+        if (siswaDitemukan) {
+            currentStudentCode = siswaDitemukan.kode;
+            document.getElementById('user-name-home').innerText = "Halo, " + siswaDitemukan.nama;
+            document.getElementById('user-name-profile').innerText = siswaDitemukan.nama;
+            document.getElementById('user-nis-profile').innerText = "NIS: " + siswaDitemukan.kode + " | Kelas: " + siswaDitemukan.kelas;
+
+            loadStudentDataIntoForm();
+            updateDashboardStatus();
+            checkGlobalNotification();
+
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('main-view').classList.remove('hidden');
+            resetLoginForm();
+            return;
+        }
+
+        alert("Kode atau Password salah! Periksa kembali ketikanmu.");
+    }
+
+    function collectFormFields() {
+        return {
+            jurnal: {
+                perasaan: document.getElementById('inp-jurnal-perasaan').value,
+                kegiatan: document.getElementById('inp-jurnal-kegiatan').value,
+                belajar: document.getElementById('inp-jurnal-belajar').value,
+                refleksi: document.getElementById('inp-jurnal-refleksi').value
+            },
+            literasi: {
+                judul: document.getElementById('inp-lit-judul').value,
+                sumber: document.getElementById('inp-lit-sumber').value,
+                ringkasan: document.getElementById('inp-lit-ringkasan').value,
+                refleksi: document.getElementById('inp-lit-refleksi').value
+            },
+            numerasi: {
+                topik: document.getElementById('inp-num-topik').value,
+                soal: document.getElementById('inp-num-soal').value,
+                jawaban: document.getElementById('inp-num-jawaban').value,
+                cara: document.getElementById('inp-num-cara').value
+            },
+            target: {
+                teks: document.getElementById('inp-target-teks').value,
+                waktu: document.getElementById('inp-target-waktu').value
+            },
+            waktu: {
+                kegiatan: document.getElementById('inp-waktu-kegiatan').value,
+                mulai: document.getElementById('inp-waktu-mulai').value,
+                selesai: document.getElementById('inp-waktu-selesai').value,
+                ket: document.getElementById('inp-waktu-ket').value,
+                ingat: document.getElementById('inp-waktu-ingat').checked
+            },
+            lingkungan: {
+                kat: document.getElementById('inp-ling-kat').value,
+                lokasi: document.getElementById('inp-ling-lokasi').value,
+                laporan: document.getElementById('inp-ling-laporan').value,
+                saran: document.getElementById('inp-ling-saran').value
+            }
+        };
+    }
+
+    function autoSave() {
+        if (!currentStudentCode) return;
+        const data = collectFormFields();
+        localStorage.setItem('draft_' + currentStudentCode, JSON.stringify(data));
+        
+        let historyMeta = JSON.parse(localStorage.getItem('history_' + currentStudentCode) || '{}');
+        if (!historyMeta.createdAt) {
+            historyMeta.createdAt = new Date().toLocaleString('id-ID');
+        }
+        historyMeta.updatedAt = new Date().toLocaleString('id-ID');
+        localStorage.setItem('history_' + currentStudentCode, JSON.stringify(historyMeta));
+
+        updateProgressIndicators(data);
+    }
+
+    function loadStudentDataIntoForm() {
+        if (!currentStudentCode) return;
+        
+        const rawDraft = localStorage.getItem('draft_' + currentStudentCode);
+        const rawFinal = localStorage.getItem('data_jurnal_' + currentStudentCode);
+        const sourceData = rawFinal ? JSON.parse(rawFinal) : (rawDraft ? JSON.parse(rawDraft) : null);
+
+        if (sourceData) {
+            if (sourceData.jurnal) {
+                document.getElementById('inp-jurnal-perasaan').value = sourceData.jurnal.perasaan || '';
+                document.getElementById('inp-jurnal-kegiatan').value = sourceData.jurnal.kegiatan || '';
+                document.getElementById('inp-jurnal-belajar').value = sourceData.jurnal.belajar || '';
+                document.getElementById('inp-jurnal-refleksi').value = sourceData.jurnal.refleksi || '';
+            }
+            if (sourceData.literasi) {
+                document.getElementById('inp-lit-judul').value = sourceData.literasi.judul || '';
+                document.getElementById('inp-lit-sumber').value = sourceData.literasi.sumber || '';
+                document.getElementById('inp-lit-ringkasan').value = sourceData.literasi.ringkasan || '';
+                document.getElementById('inp-lit-refleksi').value = sourceData.literasi.refleksi || '';
+            }
+            if (sourceData.numerasi) {
+                document.getElementById('inp-num-topik').value = sourceData.numerasi.topik || '';
+                document.getElementById('inp-num-soal').value = sourceData.numerasi.soal || '';
+                document.getElementById('inp-num-jawaban').value = sourceData.numerasi.jawaban || '';
+                document.getElementById('inp-num-cara').value = sourceData.numerasi.cara || '';
+            }
+            if (sourceData.target) {
+                document.getElementById('inp-target-teks').value = sourceData.target.teks || '';
+                document.getElementById('inp-target-waktu').value = sourceData.target.waktu || '';
+            }
+            if (sourceData.waktu) {
+                document.getElementById('inp-waktu-kegiatan').value = sourceData.waktu.kegiatan || '';
+                document.getElementById('inp-waktu-mulai').value = sourceData.waktu.mulai || '';
+                document.getElementById('inp-waktu-selesai').value = sourceData.waktu.selesai || '';
+                document.getElementById('inp-waktu-ket').value = sourceData.waktu.ket || '';
+                document.getElementById('inp-waktu-ingat').checked = !!sourceData.waktu.ingat;
+            }
+            if (sourceData.lingkungan) {
+                document.getElementById('inp-ling-kat').value = sourceData.lingkungan.kat || 'Kebersihan';
+                document.getElementById('inp-ling-lokasi').value = sourceData.lingkungan.lokasi || '';
+                document.getElementById('inp-ling-laporan').value = sourceData.lingkungan.laporan || '';
+                document.getElementById('inp-ling-saran').value = sourceData.lingkungan.saran || '';
+            }
+            updateProgressIndicators(sourceData);
+        }
+
+        const historyMeta = JSON.parse(localStorage.getItem('history_' + currentStudentCode) || '{}');
+        document.getElementById('history-created-time').innerText = historyMeta.createdAt ? `Dibuat: ${historyMeta.createdAt} | Diedit: ${historyMeta.updatedAt || '-'}` : "Belum ada aktivitas";
+
+        const teacherFeedback = JSON.parse(localStorage.getItem('feedback_' + currentStudentCode) || '{}');
+        document.getElementById('student-notes-view').innerText = teacherFeedback.note || "Belum ada catatan dari guru.";
+        
+        if (teacherFeedback.grades) {
+            const g = teacherFeedback.grades;
+            const avg = Math.round(((parseInt(g.jurnal)||0) + (parseInt(g.literasi)||0) + (parseInt(g.numerasi)||0) + (parseInt(g.target)||0)) / 4);
+            document.getElementById('student-grades-view').innerHTML = `
+                Jurnal Diri: <strong>${g.jurnal || 0}</strong><br>
+                Literasi: <strong>${g.literasi || 0}</strong><br>
+                Numerasi: <strong>${g.numerasi || 0}</strong><br>
+                Target Belajar: <strong>${g.target || 0}</strong><br>
+                <hr style="border:0; border-top:1px solid var(--border-color); margin:5px 0;">
+                Total Rata-rata: <strong>${avg}</strong>
+            `;
+        }
+    }
+
+    function updateProgressIndicators(data) {
+        let completed = 0;
+        
+        if (data.jurnal && (data.jurnal.kegiatan || data.jurnal.belajar)) {
+            completed++;
+            document.getElementById('icon-m1').innerText = "✅";
+        } else { document.getElementById('icon-m1').innerText = "📝"; }
+
+        if (data.literasi && (data.literasi.judul || data.literasi.ringkasan)) {
+            completed++;
+            document.getElementById('icon-m2').innerText = "✅";
+        } else { document.getElementById('icon-m2').innerText = "📚"; }
+
+        if (data.numerasi && (data.numerasi.topik || data.numerasi.soal)) {
+            completed++;
+            document.getElementById('icon-m3').innerText = "✅";
+        } else { document.getElementById('icon-m3').innerText = "🔢"; }
+
+        if (data.target && data.target.teks) {
+            completed++;
+            document.getElementById('icon-m4').innerText = "✅";
+        } else { document.getElementById('icon-m4').innerText = "🎯"; }
+
+        if (data.waktu && data.waktu.kegiatan) {
+            completed++;
+            document.getElementById('icon-m5').innerText = "✅";
+        } else { document.getElementById('icon-m5').innerText = "⏰"; }
+
+        if (data.lingkungan && data.lingkungan.laporan) {
+            completed++;
+            document.getElementById('icon-m6').innerText = "✅";
+        } else { document.getElementById('icon-m6').innerText = "🏫"; }
+
+        document.getElementById('status-count').innerText = completed + "/6";
+    }
+
+    function updateDashboardStatus() {
+        const isSubmitted = localStorage.getItem('submitted_' + currentStudentCode) === 'true';
+        const statusText = document.getElementById('status-text');
+        const lockedBanner = document.getElementById('locked-banner');
+        const historyBadge = document.getElementById('history-badge');
+        const historyDesc = document.getElementById('history-status-desc');
+        const submitSection = document.getElementById('submit-section');
+        const submitTimestamp = document.getElementById('submit-timestamp');
+
+        if (isSubmitted) {
+            statusText.innerText = "Final (Terkunci)";
+            statusText.style.color = "var(--success)";
+            lockedBanner.classList.remove('hidden');
+            submitSection.classList.add('hidden');
+            historyBadge.innerText = "Selesai";
+            historyBadge.style.backgroundColor = "var(--success)";
+            
+            const timeStr = localStorage.getItem('time_' + currentStudentCode) || '-';
+            historyDesc.innerText = `Dikirim: ${timeStr}`;
+            submitTimestamp.innerText = `Dikirim: ${timeStr}`;
+            
+            disableAllInputs(true);
+        } else {
+            statusText.innerText = "Belum Final";
+            statusText.style.color = "var(--warning)";
+            lockedBanner.classList.add('hidden');
+            submitSection.classList.remove('hidden');
+            historyBadge.innerText = "Belum";
+            historyBadge.style.backgroundColor = "var(--warning)";
+            historyDesc.innerText = "Draft tersimpan (Bisa diedit)";
+            disableAllInputs(false);
+        }
+    }
+
+    function disableAllInputs(disable) {
+        const elements = document.querySelectorAll('#content-area input, #content-area textarea, #content-area select');
+        elements.forEach(el => el.disabled = disable);
+    }
+
+    function checkGlobalNotification() {
+        const broadcast = localStorage.getItem('global_announcement');
+        const banner = document.getElementById('notif-banner');
+        const preview = document.getElementById('notif-text-preview');
+        const modalBody = document.getElementById('modal-notif-body');
+
+        if (broadcast) {
+            banner.classList.remove('hidden');
+            preview.innerText = broadcast;
+            modalBody.innerText = broadcast;
+        } else {
+            banner.classList.add('hidden');
+            modalBody.innerText = "Belum ada pengumuman baru dari guru.";
+        }
+    }
+
+    function openNotificationModal() {
+        document.getElementById('notification-modal').classList.remove('hidden');
+    }
+    function closeNotificationModal() {
+        document.getElementById('notification-modal').classList.add('hidden');
+    }
+
+    function resetLoginForm() {
+        document.getElementById('input-kode').value = '';
+        document.getElementById('input-pass').value = '';
+    }
+
+    function doLogout() {
+        currentStudentCode = null;
+        document.getElementById('main-view').classList.add('hidden');
+        document.getElementById('admin-view').classList.add('hidden');
+        document.getElementById('login-view').classList.remove('hidden');
+        switchNav('page-home', document.querySelector('.nav-item')); 
+    }
+
+    function switchNav(pageId, element) {
+        const allPages = document.querySelectorAll('#content-area > div');
+        allPages.forEach(page => page.classList.add('hidden'));
+        document.getElementById(pageId).classList.remove('hidden');
+
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(nav => nav.classList.remove('active'));
+        element.classList.add('active');
+        
+        document.getElementById('bottom-nav').style.display = 'flex';
+    }
+
+    function openModule(moduleId) {
+        const allPages = document.querySelectorAll('#content-area > div');
+        allPages.forEach(page => page.classList.add('hidden'));
+
+        document.getElementById(moduleId).classList.remove('hidden');
+        document.getElementById('bottom-nav').style.display = 'none';
+        window.scrollTo(0,0);
+    }
+
+    function closeModule() {
+        autoSave();
+        const allPages = document.querySelectorAll('#content-area > div');
+        allPages.forEach(page => page.classList.add('hidden'));
+        
+        document.getElementById('page-home').classList.remove('hidden');
+        document.getElementById('bottom-nav').style.display = 'flex';
+    }
+
+    function confirmSubmit() {
+        const isSubmitted = localStorage.getItem('submitted_' + currentStudentCode) === 'true';
+        if (isSubmitted) {
+            alert("Jurnal ini sudah dikirim sebelumnya!");
+            return;
+        }
+
+        const data = collectFormFields();
+        
+        if (!data.jurnal.kegiatan) { alert("⚠️ Modul Jurnal Diri belum diisi lengkap. Lengkapi terlebih dahulu."); return; }
+        if (!data.literasi.judul) { alert("⚠️ Modul Literasi belum diisi lengkap. Lengkapi terlebih dahulu."); return; }
+        if (!data.numerasi.topik) { alert("⚠️ Modul Numerasi belum diisi lengkap. Lengkapi terlebih dahulu."); return; }
+        if (!data.target.teks) { alert("⚠️ Modul Target Belajar belum diisi lengkap. Lengkapi terlebih dahulu."); return; }
+        if (!data.waktu.kegiatan) { alert("⚠️ Modul Manajemen Waktu belum diisi lengkap. Lengkapi terlebih dahulu."); return; }
+        if (!data.lingkungan.laporan) { alert("⚠️ Modul Lapor Lingkungan belum diisi lengkap. Lengkapi terlebih dahulu."); return; }
+
+        document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('confirm-modal').classList.add('hidden');
+    }
+
+    function executeSubmit() {
+        closeModal();
+        const data = collectFormFields();
+        const timeNow = new Date().toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
+
+        localStorage.setItem('submitted_' + currentStudentCode, 'true');
+        localStorage.setItem('data_jurnal_' + currentStudentCode, JSON.stringify(data));
+        localStorage.setItem('time_' + currentStudentCode, timeNow);
+
+        alert("Jurnal berhasil dikirim dan dikunci permanen!");
+        updateDashboardStatus();
+    }
+
+    function loadAdminDashboard() {
+        let total = dataSiswa.length;
+        let submitted = 0;
+
+        dataSiswa.forEach(s => {
+            if (localStorage.getItem('submitted_' + s.kode) === 'true') submitted++;
+        });
+
+        document.getElementById('stat-total').innerText = total;
+        document.getElementById('stat-submitted').innerText = submitted;
+        document.getElementById('stat-unsubmitted').innerText = total - submitted;
+        document.getElementById('stat-percent').innerText = Math.round((submitted / total) * 100) + "%";
+
+        filterAdminList();
+    }
+
+    function filterAdminList() {
+        const query = document.getElementById('admin-search').value.toLowerCase();
+        const statusFilter = document.getElementById('admin-filter-status').value;
+        const classFilter = document.getElementById('admin-filter-class').value;
+
+        let listHtml = "";
+        dataSiswa.forEach(siswa => {
+            const isSub = localStorage.getItem('submitted_' + siswa.kode) === 'true';
+            
+            if (siswa.kelas !== classFilter) return;
+            if (statusFilter === 'submitted' && !isSub) return;
+            if (statusFilter === 'unsubmitted' && isSub) return;
+            if (query && !siswa.nama.toLowerCase().includes(query) && !siswa.kode.toLowerCase().includes(query)) return;
+
+            listHtml += `
+                <div class="list-item">
+                    <div><strong>${siswa.nama}</strong><br><span style="font-size:12px; color:var(--text-muted);">NIS: ${siswa.kode} | ${siswa.kelas}</span></div>
+                    <div>
+                        ${isSub ? 
+                            `<span class="badge" style="background:var(--success); margin-right:6px;">Sudah</span>
+                             <button onclick="openTeacherDetail('${siswa.kode}')" style="background:var(--primary); color:white; border:none; padding:5px 8px; border-radius:5px; cursor:pointer; font-size:11px;">Periksa</button>` : 
+                            `<span class="badge" style="background:var(--warning)">Belum</span>`
+                        }
+                    </div>
+                </div>
+            `;
+        });
+
+        document.getElementById('admin-student-list').innerHTML = listHtml || "<p style='font-size:13px; color:var(--text-muted); text-align:center;'>Tidak ada siswa ditemukan.</p>";
+    }
+
+    function openTeacherDetail(kodeSiswa) {
+        const siswa = dataSiswa.find(s => s.kode === kodeSiswa);
+        const rawData = localStorage.getItem('data_jurnal_' + kodeSiswa);
+        viewingStudentCode = kodeSiswa;
+
+        document.getElementById('detail-modal-title').innerText = `Periksa Jurnal: ${siswa.nama} (${siswa.kode})`;
+
+        if (!rawData) {
+            document.getElementById('detail-modal-content').innerHTML = "<p>Belum ada data final dikirim.</p>";
+        } else {
+            const d = JSON.parse(rawData);
+            let html = `
+                <p><strong>1. Jurnal Diri:</strong><br>- Perasaan: ${d.jurnal.perasaan}<br>- Kegiatan: ${d.jurnal.kegiatan}<br>- Belajar: ${d.jurnal.belajar}<br>- Refleksi: ${d.jurnal.refleksi}</p><br>
+                <p><strong>2. Literasi:</strong><br>- Judul: ${d.literasi.judul}<br>- Sumber: ${d.literasi.sumber}<br>- Ringkasan: ${d.literasi.ringkasan}<br>- Refleksi: ${d.literasi.refleksi}</p><br>
+                <p><strong>3. Numerasi:</strong><br>- Topik: ${d.numerasi.topik}<br>- Soal: ${d.numerasi.soal}<br>- Jawaban: ${d.numerasi.jawaban}<br>- Cara: ${d.numerasi.cara}</p><br>
+                <p><strong>4. Target Belajar:</strong><br>- Target: ${d.target.teks}<br>- Waktu: ${d.target.waktu}</p><br>
+                <p><strong>5. Manajemen Waktu:</strong><br>- Kegiatan: ${d.waktu.kegiatan}<br>- Jam: ${d.waktu.mulai}-${d.waktu.selesai}</p><br>
+                <p><strong>6. Lingkungan:</strong><br>- Kategori: ${d.lingkungan.kat}<br>- Laporan: ${d.lingkungan.laporan}</p>
+            `;
+            document.getElementById('detail-modal-content').innerHTML = html;
+        }
+
+        const existingFeedback = JSON.parse(localStorage.getItem('feedback_' + kodeSiswa) || '{}');
+        document.getElementById('grade-jurnal').value = existingFeedback.grades?.jurnal || '';
+        document.getElementById('grade-literasi').value = existingFeedback.grades?.literasi || '';
+        document.getElementById('grade-numerasi').value = existingFeedback.grades?.numerasi || '';
+        document.getElementById('grade-target').value = existingFeedback.grades?.target || '';
+        document.getElementById('admin-teacher-note').value = existingFeedback.note || '';
+
+        document.getElementById('detail-modal').classList.remove('hidden');
+    }
+
+    function closeDetailModal() {
+        document.getElementById('detail-modal').classList.add('hidden');
+    }
+
+    function saveTeacherGrading() {
+        if (!viewingStudentCode) return;
+        const feedback = {
+            grades: {
+                jurnal: document.getElementById('grade-jurnal').value,
+                literasi: document.getElementById('grade-literasi').value,
+                numerasi: document.getElementById('grade-numerasi').value,
+                target: document.getElementById('grade-target').value
+            },
+            note: document.getElementById('admin-teacher-note').value
+        };
+
+        localStorage.setItem('feedback_' + viewingStudentCode, JSON.stringify(feedback));
+        alert("Nilai dan catatan berhasil disimpan untuk siswa!");
+        closeDetailModal();
+    }
+
+    function saveAdminBroadcast() {
+        const text = document.getElementById('admin-broadcast-input').value;
+        if (!text) { alert("Tulis pengumuman terlebih dahulu."); return; }
+        localStorage.setItem('global_announcement', text);
+        alert("Pengumuman berhasil disiarkan ke semua siswa!");
+    }
+
+    function downloadAllRekap() {
+        let csvContent = "NIS,Nama,Kelas,Status,Waktu_Kirim,Jurnal_Perasaan,Literasi_Judul,Numerasi_Topik\n";
+
+        dataSiswa.forEach(s => {
+            const isSub = localStorage.getItem('submitted_' + s.kode) === 'true';
+            const timeSub = localStorage.getItem('time_' + s.kode) || '-';
+            if (isSub) {
+                const raw = localStorage.getItem('data_jurnal_' + s.kode);
+                if (raw) {
+                    const d = JSON.parse(raw);
+                    csvContent += `${s.kode},"${s.nama}",${s.kelas},Selesai,"${timeSub}","${d.jurnal.perasaan}","${d.literasi.judul}","${d.numerasi.topik}"\n`;
+                }
+            } else {
+                csvContent += `${s.kode},"${s.nama}",${s.kelas},Belum,-,-,-,-\n`;
+            }
+        });
+
+        const element = document.createElement('a');
+        element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent));
+        element.setAttribute('download', 'Rekap_Jurnal_Siswa.csv');
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+    }
+</script>
+
+</body>
+</html>
