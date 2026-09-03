@@ -169,6 +169,15 @@
                 </div>
             </div>
 
+            <!-- Pilihan Jenis Grafik -->
+            <div style="margin-bottom: 15px; text-align: center;">
+                <label style="font-weight: bold; color: var(--primary); margin-right: 10px;">Pilih Jenis Grafik:</label>
+                <select id="chartTypeSelect" onchange="changeChartType()" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                    <option value="pie">Grafik Pie (Lingkaran)</option>
+                    <option value="bar">Grafik Batang (Bar)</option>
+                </select>
+            </div>
+
             <div style="width: 100%; max-width: 400px; margin: 20px auto 0 auto;">
                 <canvas id="voteChart"></canvas>
             </div>
@@ -205,18 +214,18 @@
             { nis: "2026", nama: "Muhtazam Afreza", password: "123" }
         ];
 
-        // --- DATA PASANGAN CALON (Visi Normal, Kelas X A & X B) ---
+        // --- DATA PASANGAN CALON (Nama Paslon 1 & Paslon 2, Foto Manusia, Kelas Angka Romawi X A & X B) ---
         const candidates = [
             { 
-                id: 1, label: "Paslon Nomor 1", 
-                ketua: "SpongeBob SquarePants", kelasK: "X A", imgK: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=compress&w=300",
-                wakil: "Patrick Star", kelasW: "X A", imgW: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=compress&w=300", 
+                id: 1, label: "Paslon 1", 
+                ketua: "Paslon 1", kelasK: "X A", imgK: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=compress&w=300",
+                wakil: "Paslon 1", kelasW: "X A", imgW: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=compress&w=300", 
                 visi: "Mewujudkan OSIS sebagai wadah aspirasi siswa yang aktif, berprestasi, berkarakter, dan berlandaskan kekeluargaan."
             },
             { 
-                id: 2, label: "Paslon Nomor 2", 
-                ketua: "Squidward Tentacles", kelasK: "X B", imgK: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=compress&w=300",
-                wakil: "Tuan Krabs", kelasW: "X B", imgW: "https://images.unsplash.com/photo-1563089145-599997674d42?auto=compress&w=300", 
+                id: 2, label: "Paslon 2", 
+                ketua: "Paslon 2", kelasK: "X B", imgK: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=compress&w=300",
+                wakil: "Paslon 2", kelasW: "X B", imgW: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=compress&w=300", 
                 visi: "Menjadikan lingkungan sekolah yang disiplin, inovatif, serta unggul dalam bidang akademik maupun non-akademik."
             }
         ];
@@ -224,11 +233,17 @@
         let currentUser = null; 
         let selectedCandidateId = null;
         let chartInstance = null;
+        let currentChartType = 'pie';
 
         function showPage(pageId) {
             document.querySelectorAll('.box').forEach(box => box.classList.add('hidden'));
             document.getElementById(pageId).classList.remove('hidden');
             window.scrollTo(0, 0);
+        }
+
+        function changeChartType() {
+            currentChartType = document.getElementById('chartTypeSelect').value;
+            renderAdminData();
         }
 
         // --- REALTIME LISTENER STATUS VOTING & AUTO-CLOSE ---
@@ -450,10 +465,11 @@
             if (chartInstance) chartInstance.destroy();
 
             chartInstance = new Chart(ctx, {
-                type: 'pie',
+                type: currentChartType,
                 data: {
                     labels: ['Paslon 1', 'Paslon 2'],
                     datasets: [{
+                        label: 'Jumlah Suara',
                         data: [v1, v2],
                         backgroundColor: ['#1E3E62', '#F2B538'],
                         borderWidth: 2, borderColor: '#fff'
@@ -461,7 +477,10 @@
                 },
                 options: { 
                     responsive: true,
-                    plugins: { legend: { position: 'bottom' } }
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: currentChartType === 'bar' ? {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    } : {}
                 }
             });
         }
