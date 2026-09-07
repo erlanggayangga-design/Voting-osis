@@ -12,78 +12,388 @@
     
     <style>
         :root {
-            --primary: #1E3E62; /* Navy Blue */
-            --secondary: #F2B538; /* Gold */
-            --bg-color: #f0f4f8;
-            --text-dark: #333;
-            --success: #28a745;
-            --danger: #dc3545;
+            --primary: #0f172a;       /* Slate/Navy Gelap Elegan */
+            --primary-accent: #1e293b;
+            --secondary: #d97706;     /* Gold Muted / Amber */
+            --secondary-hover: #b45309;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
             --white: #ffffff;
         }
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
-        body { background-color: var(--bg-color); color: var(--text-dark); display: flex; flex-direction: column; min-height: 100vh; }
+
+        * { 
+            box-sizing: border-box; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-dark); 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh; 
+        } 
         
         /* Header & Logo */
-        header { background: var(--primary); color: var(--white); padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .school-logo { width: 85px; height: 85px; object-fit: contain; margin-bottom: 10px; background-color: transparent; border: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
-        header h1 { font-size: 26px; margin-bottom: 5px; color: var(--secondary); }
-        header p { font-size: 14px; opacity: 0.9; }
+        header { 
+            background: var(--primary); 
+            color: var(--white); 
+            padding: 24px 20px; 
+            text-align: center; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .school-logo { 
+            width: 130px; 
+            height: 130px; 
+            object-fit: contain; 
+            margin-bottom: 12px; 
+        }
+
+        header h1 { 
+            font-size: 22px; 
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px; 
+            color: var(--white); 
+        }
+
+        header p { 
+            font-size: 13px; 
+            color: var(--text-muted); 
+            letter-spacing: 0.01em;
+        }
+
+        /* Status Indikator Server & Network Bar */
+        #network-status {
+            background: var(--primary);
+            color: var(--white);
+            text-align: center;
+            font-size: 12px;
+            padding: 6px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .dot-online { background-color: var(--success); box-shadow: 0 0 6px var(--success); }
+        .dot-offline { background-color: var(--danger); box-shadow: 0 0 6px var(--danger); }
         
         /* Countdown Banner */
-        #countdown-banner { background: var(--secondary); color: var(--text-dark); text-align: center; padding: 10px; font-weight: bold; font-size: 16px; letter-spacing: 1px; }
+        #countdown-banner { 
+            background: var(--primary-accent); 
+            color: var(--white); 
+            text-align: center; 
+            padding: 10px 16px; 
+            font-weight: 500; 
+            font-size: 13px; 
+            letter-spacing: 0.02em;
+            border-bottom: 1px solid var(--border-color);
+        }
 
-        .container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 30px 15px; }
-        .box { background: var(--white); width: 100%; max-width: 600px; padding: 30px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+        .container { 
+            flex: 1; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 40px 16px; 
+        }
+
+        .box { 
+            background: var(--card-bg); 
+            width: 100%; 
+            max-width: 440px; 
+            padding: 36px 32px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.03); 
+        }
+
         .hidden { display: none !important; }
-        h2 { text-align: center; margin-bottom: 20px; color: var(--primary); }
 
-        /* Form Elements */
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--primary); }
-        .input-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; transition: 0.3s; }
-        .input-group input:focus { border-color: var(--primary); outline: none; }
+        h2 { 
+            text-align: center; 
+            margin-bottom: 24px; 
+            color: var(--primary); 
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        /* Form Elements & Style Login Minimalis */
+        .input-group { margin-bottom: 18px; position: relative; }
+
+        .input-group label { 
+            display: block; 
+            margin-bottom: 6px; 
+            font-weight: 600; 
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted); 
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group input { 
+            width: 100%; 
+            padding: 11px 14px; 
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            font-size: 14px; 
+            color: var(--text-dark);
+            outline: none;
+            transition: all 0.2s ease; 
+        }
+
+        .input-group input:focus { 
+            border-color: var(--primary); 
+            background-color: var(--white);
+            box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08); 
+        }
+
+        /* Toggle Password Eye Icon */
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            user-select: none;
+            color: var(--text-muted);
+        }
         
         /* Buttons */
-        .btn { width: 100%; padding: 14px; background: var(--primary); color: var(--white); border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        .btn:hover { background: #152b45; }
+        .btn { 
+            width: 100%; 
+            padding: 12px; 
+            background: var(--primary); 
+            color: var(--white); 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 14px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: background-color 0.2s ease, transform 0.1s ease; 
+            margin-top: 8px; 
+        }
+
+        .btn:hover { background: #1e293b; }
+        .btn:active { transform: scale(0.99); }
+
         .btn-green { background: var(--success); }
-        .btn-green:hover { background: #218838; }
-        .btn-gold { background: var(--secondary); color: var(--primary); }
-        .btn-gold:hover { background: #dca028; }
+        .btn-green:hover { background: #059669; }
+
+        .btn-gold { background: var(--secondary); color: var(--white); }
+        .btn-gold:hover { background: var(--secondary-hover); }
+
         .btn-red { background: var(--danger); }
-        .btn-red:hover { background: #c82333; }
-        .btn-gray { background: #6c757d; }
-        .btn-gray:hover { background: #5a6268; }
+        .btn-red:hover { background: #dc2626; }
+
+        .btn-gray { background: #64748b; }
+        .btn-gray:hover { background: #475569; }
 
         /* Candidate Card */
-        .card { border: 2px solid #eaeaea; border-radius: 12px; padding: 20px; margin-bottom: 20px; background: var(--white); transition: 0.3s; }
-        .card:hover { border-color: var(--primary); box-shadow: 0 4px 15px rgba(30, 62, 98, 0.1); }
-        .card-title { text-align: center; font-size: 22px; color: var(--primary); margin-bottom: 15px; font-weight: bold; }
+        .card { 
+            border: 1px solid var(--border-color); 
+            border-radius: 10px; 
+            padding: 24px; 
+            margin-bottom: 20px; 
+            background: var(--white); 
+            transition: border-color 0.2s ease; 
+        }
+
+        .card:hover { 
+            border-color: var(--primary); 
+        }
+
+        .card-title { 
+            text-align: center; 
+            font-size: 18px; 
+            color: var(--primary); 
+            margin-bottom: 20px; 
+            font-weight: 700; 
+        }
         
         /* Photos Grid */
-        .photos-container { display: flex; justify-content: center; gap: 20px; margin-bottom: 20px; }
+        .photos-container { display: flex; justify-content: center; gap: 24px; margin-bottom: 20px; }
         .photo-box { text-align: center; }
-        .photo-box img { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 4px solid var(--secondary); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .photo-label { display: block; font-weight: bold; margin-top: 8px; color: var(--primary); font-size: 14px;}
-        .photo-name { display: block; font-size: 16px; font-weight: bold; }
-        .photo-class { display: block; font-size: 13px; color: #666; }
 
-        /* Visi Misi */
-        .vision-mission { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 14px;}
-        .vision-mission h4 { color: var(--primary); margin-bottom: 5px; text-align: center;}
-        .vision-mission p { font-style: italic; text-align: center; margin-bottom: 0; line-height: 1.5;}
+        .photo-box img { 
+            width: 100px; 
+            height: 100px; 
+            object-fit: cover; 
+            border-radius: 50%; 
+            border: 2px solid var(--border-color); 
+            margin-bottom: 8px;
+        }
+
+        .photo-label { 
+            display: block; 
+            font-weight: 600; 
+            color: var(--text-muted); 
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .photo-name { display: block; font-size: 15px; font-weight: 600; color: var(--text-dark); }
+        .photo-class { display: block; font-size: 12px; color: var(--text-muted); }
+
+        /* Visi */
+        .vision-mission { 
+            background: #f8fafc; 
+            padding: 16px; 
+            border-radius: 8px; 
+            border: 1px solid var(--border-color);
+            margin-bottom: 16px; 
+            font-size: 13px;
+        }
+
+        .vision-mission h4 { color: var(--primary); margin-bottom: 6px; text-align: center; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .vision-mission p { text-align: center; margin-bottom: 0; line-height: 1.6; color: var(--text-muted); }
+
+        /* Digital Receipt Box Style */
+        .receipt-card {
+            background: #ffffff;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+            text-align: left;
+            position: relative;
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .receipt-row strong { color: var(--text-dark); }
+
+        .receipt-code {
+            background: #f1f5f9;
+            padding: 8px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 13px;
+            text-align: center;
+            letter-spacing: 1px;
+            margin-top: 10px;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* Progress Bar Partisipasi Admin */
+        .progress-container {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 12px;
+            width: 100%;
+            overflow: hidden;
+            margin: 8px 0 16px 0;
+        }
+
+        .progress-bar {
+            background: var(--success);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Search & Status Siswa Admin */
+        .search-box { margin-bottom: 16px; }
+        
+        .student-list-container {
+            max-height: 220px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+        }
+        .student-item:last-child { border-bottom: none; }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
 
         /* Welcome Text */
-        .welcome-text { text-align: center; font-size: 18px; margin-bottom: 20px; font-weight: bold; color: var(--success); border-bottom: 2px dashed #ddd; padding-bottom: 10px;}
+        .welcome-text { text-align: center; font-size: 16px; margin-bottom: 20px; font-weight: 600; color: var(--success); border-bottom: 1px solid var(--border-color); padding-bottom: 12px;}
 
         /* Admin Grid Stats */
-        .admin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; text-align: center; }
-        .stat-box { background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
-        .stat-box h3 { margin: 0; font-size: 24px; color: var(--primary); }
-        .stat-box p { margin: 0; font-size: 12px; color: #666; font-weight: bold; }
-        .winner-banner { background: var(--secondary); color: var(--primary); padding: 15px; text-align: center; border-radius: 8px; font-weight: bold; font-size: 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px;}
+        .admin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; text-align: center; }
         
-        .admin-controls { background: #eef2f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--primary); }
+        .stat-box { 
+            background: #f8fafc; 
+            padding: 16px 12px; 
+            border-radius: 8px; 
+            border: 1px solid var(--border-color); 
+        }
+
+        .stat-box h3 { margin: 0; font-size: 22px; color: var(--primary); font-weight: 700; }
+        .stat-box p { margin-top: 4px; font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em; }
+        
+        .winner-banner { 
+            background: #f8fafc; 
+            color: var(--primary); 
+            padding: 14px; 
+            text-align: center; 
+            border-radius: 8px; 
+            border: 1px solid var(--border-color);
+            font-weight: 600; 
+            font-size: 15px; 
+            margin-bottom: 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px;
+        }
+        
+        .admin-controls { 
+            background: #f8fafc; 
+            padding: 18px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            border: 1px solid var(--border-color); 
+        }
+
         .flex-between { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         
         canvas { max-width: 100%; margin: 0 auto; display: block; }
@@ -92,59 +402,84 @@
 <body>
 
     <header>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/9/9c/Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg" alt="Logo SNT" class="school-logo">
+        <img src="https://iili.io/n28EQJ2.png" alt="Logo SNT" class="school-logo">
         <h1>Sekolah Nasional Terintegrasi</h1>
         <p>Pemilihan Ketua & Wakil OSIS Periode 2026/2027</p>
     </header>
+
+    <!-- STATUS INDIKATOR NETWORK & FIREBASE -->
+    <div id="network-status">
+        <span class="status-dot dot-online" id="status-dot"></span>
+        <span id="status-text">Terhubung ke Server SNT</span>
+    </div>
+
     <div id="countdown-banner">Status Voting: Memuat...</div>
 
     <div class="container">
         <!-- 1. HALAMAN LOGIN -->
         <div id="login-page" class="box">
-            <h2>Portal Login Pemilih</h2>
+            <h2>Portal Pemilih</h2>
             <div class="input-group">
                 <label>Nomor Induk Siswa (NIS)</label>
-                <input type="text" id="nis" placeholder="Masukkan NIS Anda...">
+                <input type="text" id="nis" placeholder="Masukkan NIS Anda..." autocomplete="off">
             </div>
             <div class="input-group">
                 <label>Password</label>
-                <input type="password" id="password" placeholder="Masukkan Password...">
+                <div class="input-wrapper">
+                    <input type="password" id="password" placeholder="Masukkan Password...">
+                    <span class="toggle-password" onclick="togglePasswordVisibility()">👁️</span>
+                </div>
             </div>
             <button class="btn" onclick="login()">Masuk ke Bilik Suara</button>
         </div>
 
         <!-- 2. HALAMAN DAFTAR CALON -->
-        <div id="candidates-page" class="box hidden" style="max-width: 800px;">
+        <div id="candidates-page" class="box hidden" style="max-width: 720px;">
             <div class="welcome-text" id="welcome-msg"></div>
-            <h2 style="margin-bottom: 10px;">Daftar Kandidat</h2>
-            <p style="text-align: center; margin-bottom: 20px; color: #666;">Silakan pelajari Visi calon sebelum menentukan pilihan.</p>
+            <h2 style="margin-bottom: 8px;">Daftar Kandidat</h2>
+            <p style="text-align: center; margin-bottom: 24px; color: var(--text-muted); font-size: 14px;">Silakan pelajari Visi calon sebelum menentukan pilihan.</p>
             <div id="candidates-list"></div>
         </div>
 
         <!-- 3. HALAMAN KONFIRMASI -->
-        <div id="confirmation-page" class="box hidden">
+        <div id="confirmation-page" class="box hidden" style="max-width: 500px;">
             <h2>Konfirmasi Pilihan</h2>
             <div id="confirm-details"></div>
             <button class="btn btn-green" onclick="confirmVote()">Yakin & Kirim Suara</button>
             <button class="btn btn-gray" onclick="showPage('candidates-page')">Batal / Kembali</button>
         </div>
 
-        <!-- 4. HALAMAN SUKSES -->
+        <!-- 4. HALAMAN SUKSES + DIGITAL RECEIPT -->
         <div id="success-page" class="box hidden" style="text-align: center;">
-            <div style="font-size: 80px; color: var(--success); margin-bottom: 10px;">✅</div>
+            <div style="font-size: 54px; margin-bottom: 8px;">✅</div>
             <h2>Voting Berhasil!</h2>
-            <p style="font-size: 18px; margin-bottom: 20px;">Terima kasih <b><span id="success-name"></span></b> telah menggunakan hak pilihmu untuk masa depan Sekolah Nasional Terintegrasi.</p>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Terima kasih hak suaramu telah tercatat dengan aman di server.</p>
+
+            <!-- BUKTI DIGITAL (RECEIPT) -->
+            <div class="receipt-card">
+                <div style="text-align: center; font-weight: bold; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 12px; color: var(--primary);">
+                    🎟️ BUKTI SUARA DIGITAL SNT
+                </div>
+                <div class="receipt-row"><span>Nama Pemilih:</span> <strong><span id="receipt-nama">-</span></strong></div>
+                <div class="receipt-row"><span>NIS Siswa:</span> <strong><span id="receipt-nis">-</span></strong></div>
+                <div class="receipt-row"><span>Waktu Memilih:</span> <strong><span id="receipt-time">-</span></strong></div>
+                <div class="receipt-row"><span>Status Transaksi:</span> <strong style="color: var(--success);">Tersimpan (Sah)</strong></div>
+                
+                <div class="receipt-code" id="receipt-token">TOKEN: SNT-XXXXXX</div>
+            </div>
+            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 20px;">💡 <i>Silakan screenshot layar ini sebagai bukti bahwa kamu sudah memilih.</i></p>
+
             <button class="btn btn-gold" onclick="logout()">Selesai & Keluar</button>
         </div>
 
         <!-- 5. HALAMAN ADMIN -->
-        <div id="admin-page" class="box hidden" style="max-width: 800px;">
+        <div id="admin-page" class="box hidden" style="max-width: 720px;">
             <h2>Panel Kontrol Admin</h2>
             
             <div class="admin-controls">
-                <h4 style="margin-bottom: 10px; color: var(--primary);">Pengaturan Sesi Voting</h4>
+                <h4 style="margin-bottom: 12px; color: var(--primary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Pengaturan Sesi Voting</h4>
                 <div class="flex-between">
-                    <input type="number" id="duration" placeholder="Menit..." style="padding: 10px; width: 100px; border-radius: 5px; border: 1px solid #ccc;">
+                    <input type="number" id="duration" placeholder="Menit..." style="padding: 10px; width: 110px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 14px;">
                     <button class="btn btn-green" style="margin: 0;" onclick="openVoting()">Buka Voting</button>
                     <button class="btn btn-red" style="margin: 0;" onclick="closeVoting()">Tutup Voting</button>
                 </div>
@@ -169,21 +504,43 @@
                 </div>
             </div>
 
+            <!-- TINGKAT PARTISIPASI REALTIME -->
+            <div style="margin-bottom: 20px; background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <div class="flex-between" style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
+                    <span>TINGKAT PARTISIPASI VOTER</span>
+                    <span id="turnout-percentage" style="color: var(--primary); font-size: 14px;">0%</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="turnout-bar"></div>
+                </div>
+            </div>
+
+            <!-- SEARCH / CHECK SISWA LIST -->
+            <div class="admin-controls">
+                <h4 style="margin-bottom: 10px; color: var(--primary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Cek Hak Suara Siswa</h4>
+                <div class="search-box">
+                    <input type="text" id="search-student" placeholder="Cari NIS atau Nama Siswa..." onkeyup="filterStudentList()" style="width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 13px; outline: none;">
+                </div>
+                <div class="student-list-container" id="student-list-box">
+                    <!-- List status nyoblos siswa dimuat otomatis -->
+                </div>
+            </div>
+
             <!-- Pilihan Jenis Grafik -->
-            <div style="margin-bottom: 15px; text-align: center;">
-                <label style="font-weight: bold; color: var(--primary); margin-right: 10px;">Pilih Jenis Grafik:</label>
-                <select id="chartTypeSelect" onchange="changeChartType()" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+            <div style="margin-bottom: 16px; text-align: center;">
+                <label style="font-weight: 600; color: var(--text-muted); font-size: 13px; margin-right: 8px;">Pilih Jenis Grafik:</label>
+                <select id="chartTypeSelect" onchange="changeChartType()" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 13px; outline: none;">
                     <option value="pie">Grafik Pie (Lingkaran)</option>
                     <option value="bar">Grafik Batang (Bar)</option>
                 </select>
             </div>
 
-            <div style="width: 100%; max-width: 400px; margin: 20px auto 0 auto;">
+            <div style="width: 100%; max-width: 360px; margin: 20px auto 0 auto;">
                 <canvas id="voteChart"></canvas>
             </div>
             
-            <button class="btn btn-gray" style="margin-top: 30px;" onclick="logout()">Keluar Akun Admin</button>
-            <button class="btn" style="background: transparent; border: 1px solid #ccc; color: #666; font-size: 12px;" onclick="resetData()">Reset Seluruh Data Voting</button>
+            <button class="btn btn-gray" style="margin-top: 28px;" onclick="logout()">Keluar Akun Admin</button>
+            <button class="btn" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 12px; font-weight: 500;" onclick="resetData()">Reset Seluruh Data Voting</button>
         </div>
     </div>
 
@@ -204,6 +561,35 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // --- DETEKSI KONEKSI ONLINE/OFFLINE FIREBASE ---
+        const connectedRef = db.ref(".info/connected");
+        connectedRef.on("value", (snap) => {
+            const statusDot = document.getElementById("status-dot");
+            const statusText = document.getElementById("status-text");
+            if (snap.val() === true && navigator.onLine) {
+                statusDot.className = "status-dot dot-online";
+                statusText.innerText = "Terhubung ke Server SNT (Online)";
+            } else {
+                statusDot.className = "status-dot dot-offline";
+                statusText.innerText = "Terputus dari Server (Offline)";
+            }
+        });
+
+        window.addEventListener('offline', () => {
+            document.getElementById("status-dot").className = "status-dot dot-offline";
+            document.getElementById("status-text").innerText = "Koneksi Internet Terputus!";
+        });
+
+        // --- TOGGLE PASSWORD EYE ---
+        function togglePasswordVisibility() {
+            const passInput = document.getElementById('password');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+            } else {
+                passInput.type = 'password';
+            }
+        }
+
         // --- DATA DUMMY SISWA ---
         const registeredStudents = [
             { nis: "1001", nama: "Budi Santoso", password: "123" },
@@ -214,7 +600,7 @@
             { nis: "2026", nama: "Muhtazam Afreza", password: "123" }
         ];
 
-        // --- DATA PASANGAN CALON (Nama Paslon 1 & Paslon 2, Foto Manusia, Kelas Angka Romawi X A & X B) ---
+        // --- DATA PASANGAN CALON ---
         const candidates = [
             { 
                 id: 1, label: "Paslon 1", 
@@ -234,6 +620,7 @@
         let selectedCandidateId = null;
         let chartInstance = null;
         let currentChartType = 'pie';
+        let globalVotersData = {};
 
         function showPage(pageId) {
             document.querySelectorAll('.box').forEach(box => box.classList.add('hidden'));
@@ -377,14 +764,14 @@
                     <h3 style="text-align:center; color: var(--primary); margin-bottom: 20px;">Anda Memilih: ${c.label}</h3>
                     <div class="photos-container" style="justify-content: center;">
                         <div style="text-align:center;">
-                            <img src="${c.imgK}" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--secondary); margin: 0 10px; object-fit: cover;">
-                            <p style="font-size: 14px; font-weight: bold;">${c.ketua}</p>
-                            <p style="font-size: 12px; color: #666;">Kelas: ${c.kelasK}</p>
+                            <img src="${c.imgK}" style="width: 80px; height: 80px; border-radius: 50%; border: 1px solid var(--border-color); margin: 0 8px; object-fit: cover;">
+                            <p style="font-size: 13px; font-weight: 600;">${c.ketua}</p>
+                            <p style="font-size: 11px; color: var(--text-muted);">Kelas: ${c.kelasK}</p>
                         </div>
                         <div style="text-align:center;">
-                            <img src="${c.imgW}" style="width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--secondary); margin: 0 10px; object-fit: cover;">
-                            <p style="font-size: 14px; font-weight: bold;">${c.wakil}</p>
-                            <p style="font-size: 12px; color: #666;">Kelas: ${c.kelasW}</p>
+                            <img src="${c.imgW}" style="width: 80px; height: 80px; border-radius: 50%; border: 1px solid var(--border-color); margin: 0 8px; object-fit: cover;">
+                            <p style="font-size: 13px; font-weight: 600;">${c.wakil}</p>
+                            <p style="font-size: 11px; color: var(--text-muted);">Kelas: ${c.kelasW}</p>
                         </div>
                     </div>
                 </div>
@@ -404,7 +791,16 @@
                     db.ref('votes/' + selectedCandidateId).transaction((currentVotes) => {
                         return (currentVotes || 0) + 1;
                     }, () => {
-                        document.getElementById('success-name').innerText = currentUser.nama;
+                        // SET DIGITAL RECEIPT DATA
+                        const now = new Date();
+                        const timeStr = now.toLocaleDateString('id-ID') + ' ' + now.toLocaleTimeString('id-ID');
+                        const randomHash = 'SNT-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+                        document.getElementById('receipt-nama').innerText = currentUser.nama;
+                        document.getElementById('receipt-nis').innerText = currentUser.nis;
+                        document.getElementById('receipt-time').innerText = timeStr;
+                        document.getElementById('receipt-token').innerText = 'TOKEN: ' + randomHash;
+
                         showPage('success-page');
                     });
                 }).catch((error) => {
@@ -424,8 +820,9 @@
             db.ref().once('value', (snapshot) => {
                 const data = snapshot.val() || {};
                 const votes = data.votes || { 1: 0, 2: 0 };
-                const voters = data.voters ? Object.keys(data.voters) : [];
+                globalVotersData = data.voters || {};
                 
+                const voters = Object.keys(globalVotersData);
                 const totalSiswa = registeredStudents.length;
                 const sudahMilih = voters.length;
                 const belumMilih = totalSiswa - sudahMilih;
@@ -434,44 +831,91 @@
                 document.getElementById('stat-voted').innerText = sudahMilih;
                 document.getElementById('stat-unvoted').innerText = belumMilih;
 
+                // HITUNG PERSENTASE PARTISIPASI VOTER
+                const turnoutPct = totalSiswa > 0 ? ((sudahMilih / totalSiswa) * 100).toFixed(1) : 0;
+                document.getElementById('turnout-percentage').innerText = turnoutPct + '% (' + sudahMilih + '/' + totalSiswa + ')';
+                document.getElementById('turnout-bar').style.width = turnoutPct + '%';
+
                 const v1 = votes[1] || 0;
                 const v2 = votes[2] || 0;
+                const totalVotes = v1 + v2;
+
+                const p1 = totalVotes > 0 ? ((v1 / totalVotes) * 100).toFixed(1) : 0;
+                const p2 = totalVotes > 0 ? ((v2 / totalVotes) * 100).toFixed(1) : 0;
 
                 const winnerBanner = document.getElementById('admin-winner');
                 if (v1 === 0 && v2 === 0) {
                     winnerBanner.innerHTML = "📊 Belum ada suara yang masuk.";
-                    winnerBanner.style.background = "#eef2f5";
-                    winnerBanner.style.color = "#666";
+                    winnerBanner.style.background = "#f8fafc";
+                    winnerBanner.style.color = "var(--text-muted)";
                 } else if (v1 > v2) {
-                    winnerBanner.innerHTML = "🏆 PASLON 1 SEDANG MEMIMPIN 🏆";
-                    winnerBanner.style.background = "var(--secondary)";
-                    winnerBanner.style.color = "var(--primary)";
+                    winnerBanner.innerHTML = `🏆 PASLON 1 SEDANG MEMIMPIN (${p1}%)`;
+                    winnerBanner.style.background = "#fef3c7";
+                    winnerBanner.style.color = "#92400e";
                 } else if (v2 > v1) {
-                    winnerBanner.innerHTML = "🏆 PASLON 2 SEDANG MEMIMPIN 🏆";
-                    winnerBanner.style.background = "var(--secondary)";
-                    winnerBanner.style.color = "var(--primary)";
+                    winnerBanner.innerHTML = `🏆 PASLON 2 SEDANG MEMIMPIN (${p2}%)`;
+                    winnerBanner.style.background = "#fef3c7";
+                    winnerBanner.style.color = "#92400e";
                 } else {
-                    winnerBanner.innerHTML = "⚖️ KEDUDUKAN SEMENTARA IMBANG ⚖️";
-                    winnerBanner.style.background = "#17a2b8";
-                    winnerBanner.style.color = "white";
+                    winnerBanner.innerHTML = `⚖️ KEDUDUKAN SEMENTARA IMBANG (${p1}%)`;
+                    winnerBanner.style.background = "#e0f2fe";
+                    winnerBanner.style.color = "#075985";
                 }
 
-                renderChart(v1, v2);
+                renderStudentList();
+                renderChart(v1, v2, p1, p2);
             });
         }
 
-        function renderChart(v1, v2) {
+        // --- FILTER & RENDER DAFTAR SISWA ADMIN ---
+        function renderStudentList() {
+            filterStudentList();
+        }
+
+        function filterStudentList() {
+            const query = document.getElementById('search-student').value.toLowerCase();
+            const container = document.getElementById('student-list-box');
+            container.innerHTML = '';
+
+            const filtered = registeredStudents.filter(s => 
+                s.nama.toLowerCase().includes(query) || s.nis.toLowerCase().includes(query)
+            );
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div style="padding: 12px; text-align: center; color: var(--text-muted); font-size: 13px;">Data siswa tidak ditemukan.</div>`;
+                return;
+            }
+
+            filtered.forEach(s => {
+                const isVoted = globalVotersData[s.nis] ? true : false;
+                const badgeHTML = isVoted 
+                    ? `<span class="badge badge-success">Sudah Memilih</span>` 
+                    : `<span class="badge badge-danger">Belum Memilih</span>`;
+
+                container.innerHTML += `
+                    <div class="student-item">
+                        <div>
+                            <b>${s.nama}</b>
+                            <div style="font-size: 11px; color: var(--text-muted);">NIS: ${s.nis}</div>
+                        </div>
+                        <div>${badgeHTML}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderChart(v1, v2, p1, p2) {
             const ctx = document.getElementById('voteChart').getContext('2d');
             if (chartInstance) chartInstance.destroy();
 
             chartInstance = new Chart(ctx, {
                 type: currentChartType,
                 data: {
-                    labels: ['Paslon 1', 'Paslon 2'],
+                    labels: [`Paslon 1 (${p1}%)`, `Paslon 2 (${p2}%)`],
                     datasets: [{
                         label: 'Jumlah Suara',
                         data: [v1, v2],
-                        backgroundColor: ['#1E3E62', '#F2B538'],
+                        backgroundColor: ['#0f172a', '#d97706'],
                         borderWidth: 2, borderColor: '#fff'
                     }]
                 },
@@ -491,7 +935,7 @@
             let endTime = null;
             if (minutes && minutes > 0) {
                 endTime = new Date().getTime() + (minutes * 60 * 1000);
-                alert(`Voting dibuka selama ${minutes} menit! (Akan tertutup otomatis saat waktu habis).`);
+                alert(`Voting dibuka selama ${minutes} menit!`);
             } else {
                 alert("Voting dibuka tanpa batas waktu.");
             }
