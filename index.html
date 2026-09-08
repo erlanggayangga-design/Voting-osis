@@ -307,6 +307,30 @@
             font-weight: bold;
         }
 
+        /* --- DESAIN BARU KARTU PANEL ADMIN --- */
+        .admin-card-section {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .admin-card-header {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         /* Progress Bar Partisipasi Admin */
         .progress-container {
             background: #e2e8f0;
@@ -314,7 +338,7 @@
             height: 12px;
             width: 100%;
             overflow: hidden;
-            margin: 8px 0 16px 0;
+            margin-top: 10px;
         }
 
         .progress-bar {
@@ -325,10 +349,10 @@
         }
 
         /* Search & Status Siswa Admin */
-        .search-box { margin-bottom: 16px; }
+        .search-box { margin-bottom: 12px; }
         
         .student-list-container {
-            max-height: 220px;
+            max-height: 200px;
             overflow-y: auto;
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -358,17 +382,17 @@
         .welcome-text { text-align: center; font-size: 16px; margin-bottom: 20px; font-weight: 600; color: var(--success); border-bottom: 1px solid var(--border-color); padding-bottom: 12px;}
 
         /* Admin Grid Stats */
-        .admin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; text-align: center; }
+        .admin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; text-align: center; }
         
         .stat-box { 
             background: #f8fafc; 
-            padding: 16px 12px; 
+            padding: 14px 10px; 
             border-radius: 8px; 
             border: 1px solid var(--border-color); 
         }
 
-        .stat-box h3 { margin: 0; font-size: 22px; color: var(--primary); font-weight: 700; }
-        .stat-box p { margin-top: 4px; font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em; }
+        .stat-box h3 { margin: 0; font-size: 20px; color: var(--primary); font-weight: 700; }
+        .stat-box p { margin-top: 4px; font-size: 10px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.05em; }
         
         .winner-banner { 
             background: #f8fafc; 
@@ -377,21 +401,13 @@
             text-align: center; 
             border-radius: 8px; 
             border: 1px solid var(--border-color);
-            font-weight: 600; 
-            font-size: 15px; 
-            margin-bottom: 20px; 
+            font-weight: 700; 
+            font-size: 14px; 
+            margin-bottom: 16px; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             gap: 8px;
-        }
-        
-        .admin-controls { 
-            background: #f8fafc; 
-            padding: 18px; 
-            border-radius: 8px; 
-            margin-bottom: 20px; 
-            border: 1px solid var(--border-color); 
         }
 
         .flex-between { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
@@ -472,75 +488,85 @@
             <button class="btn btn-gold" onclick="logout()">Selesai & Keluar</button>
         </div>
 
-        <!-- 5. HALAMAN ADMIN -->
-        <div id="admin-page" class="box hidden" style="max-width: 720px;">
+        <!-- 5. HALAMAN ADMIN (DIPERBARUI DENGAN STRUKTUR RAPI) -->
+        <div id="admin-page" class="box hidden" style="max-width: 760px;">
             <h2>Panel Kontrol Admin</h2>
             
-            <div class="admin-controls">
-                <h4 style="margin-bottom: 12px; color: var(--primary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Pengaturan Sesi Voting</h4>
+            <!-- SEKSI 1: KONTROL SESI VOTING -->
+            <div class="admin-card-section">
+                <div class="admin-card-header">⚙️ Pengaturan Sesi Voting</div>
                 <div class="flex-between">
-                    <input type="number" id="duration" placeholder="Menit..." style="padding: 10px; width: 110px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 14px;">
-                    <button class="btn btn-green" style="margin: 0;" onclick="openVoting()">Buka Voting</button>
-                    <button class="btn btn-red" style="margin: 0;" onclick="closeVoting()">Tutup Voting</button>
+                    <input type="number" id="duration" placeholder="Durasi (Menit)..." style="padding: 10px 14px; flex: 1; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13px; outline: none;">
+                    <button class="btn btn-green" style="margin: 0; width: auto; padding: 10px 18px;" onclick="openVoting()">Buka Voting</button>
+                    <button class="btn btn-red" style="margin: 0; width: auto; padding: 10px 18px;" onclick="closeVoting()">Tutup Voting</button>
                 </div>
             </div>
 
-            <div class="winner-banner" id="admin-winner">
-                <!-- Pemenang otomatis muncul di sini -->
+            <!-- SEKSI 2: PEROLEHAN SUARA & REALTIME STATS -->
+            <div class="admin-card-section">
+                <div class="admin-card-header">📊 Statistik & Hasil Suara Real-Time</div>
+                
+                <div class="winner-banner" id="admin-winner">
+                    <!-- Banner Pemenang/Klasemen Sementara -->
+                </div>
+
+                <div class="admin-grid">
+                    <div class="stat-box">
+                        <h3 id="stat-total">0</h3>
+                        <p>TOTAL SISWA</p>
+                    </div>
+                    <div class="stat-box">
+                        <h3 id="stat-voted" style="color: var(--success);">0</h3>
+                        <p>SUDAH MEMILIH</p>
+                    </div>
+                    <div class="stat-box">
+                        <h3 id="stat-unvoted" style="color: var(--danger);">0</h3>
+                        <p>BELUM MEMILIH</p>
+                    </div>
+                </div>
+
+                <!-- Partisipasi Progress -->
+                <div style="margin-top: 10px;">
+                    <div class="flex-between" style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
+                        <span>Tingkat Partisipasi Voter</span>
+                        <span id="turnout-percentage" style="color: var(--primary); font-size: 13px; font-weight: 700;">0%</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="turnout-bar"></div>
+                    </div>
+                </div>
             </div>
 
-            <div class="admin-grid">
-                <div class="stat-box">
-                    <h3 id="stat-total">0</h3>
-                    <p>TOTAL SISWA</p>
-                </div>
-                <div class="stat-box">
-                    <h3 id="stat-voted" style="color: var(--success);">0</h3>
-                    <p>SUDAH MEMILIH</p>
-                </div>
-                <div class="stat-box">
-                    <h3 id="stat-unvoted" style="color: var(--danger);">0</h3>
-                    <p>BELUM MEMILIH</p>
-                </div>
-            </div>
-
-            <!-- TINGKAT PARTISIPASI REALTIME -->
-            <div style="margin-bottom: 20px; background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px solid var(--border-color);">
-                <div class="flex-between" style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
-                    <span>TINGKAT PARTISIPASI VOTER</span>
-                    <span id="turnout-percentage" style="color: var(--primary); font-size: 14px;">0%</span>
-                </div>
-                <div class="progress-container">
-                    <div class="progress-bar" id="turnout-bar"></div>
-                </div>
-            </div>
-
-            <!-- SEARCH / CHECK SISWA LIST -->
-            <div class="admin-controls">
-                <h4 style="margin-bottom: 10px; color: var(--primary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Cek Hak Suara Siswa</h4>
+            <!-- SEKSI 3: DAFTAR CEK HAK SUARA SISWA -->
+            <div class="admin-card-section">
+                <div class="admin-card-header">👥 Status Hak Suara Siswa</div>
                 <div class="search-box">
-                    <input type="text" id="search-student" placeholder="Cari NIS atau Nama Siswa..." onkeyup="filterStudentList()" style="width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 13px; outline: none;">
+                    <input type="text" id="search-student" placeholder="Ketik NIS atau Nama Siswa..." onkeyup="filterStudentList()" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13px; outline: none;">
                 </div>
                 <div class="student-list-container" id="student-list-box">
                     <!-- List status nyoblos siswa dimuat otomatis -->
                 </div>
             </div>
 
-            <!-- Pilihan Jenis Grafik -->
-            <div style="margin-bottom: 16px; text-align: center;">
-                <label style="font-weight: 600; color: var(--text-muted); font-size: 13px; margin-right: 8px;">Pilih Jenis Grafik:</label>
-                <select id="chartTypeSelect" onchange="changeChartType()" style="padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 13px; outline: none;">
-                    <option value="pie">Grafik Pie (Lingkaran)</option>
-                    <option value="bar">Grafik Batang (Bar)</option>
-                </select>
-            </div>
-
-            <div style="width: 100%; max-width: 360px; margin: 20px auto 0 auto;">
-                <canvas id="voteChart"></canvas>
+            <!-- SEKSI 4: GRAFIK HASIL VOTING -->
+            <div class="admin-card-section">
+                <div class="admin-card-header flex-between" style="border-bottom: none; padding-bottom: 0;">
+                    <span>📈 Visualisasi Grafik Suara</span>
+                    <select id="chartTypeSelect" onchange="changeChartType()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 12px; outline: none;">
+                        <option value="pie">Grafik Pie (Lingkaran)</option>
+                        <option value="bar">Grafik Batang (Bar)</option>
+                    </select>
+                </div>
+                <div style="width: 100%; max-width: 320px; margin: 16px auto 0 auto;">
+                    <canvas id="voteChart"></canvas>
+                </div>
             </div>
             
-            <button class="btn btn-gray" style="margin-top: 28px;" onclick="logout()">Keluar Akun Admin</button>
-            <button class="btn" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 12px; font-weight: 500;" onclick="resetData()">Reset Seluruh Data Voting</button>
+            <!-- SEKSI KELUAR & RESET -->
+            <div style="display: flex; gap: 10px; margin-top: 24px;">
+                <button class="btn btn-gray" style="margin: 0; flex: 1;" onclick="logout()">Keluar Akun Admin</button>
+                <button class="btn btn-red" style="margin: 0; flex: 1; background: #fff; color: var(--danger); border: 1px solid var(--danger);" onclick="resetData()">Reset Seluruh Data Voting</button>
+            </div>
         </div>
     </div>
 
@@ -779,6 +805,7 @@
             showPage('confirmation-page');
         }
 
+        // --- FUNGSI CONFIRM VOTE (DENGAN FIX ERROR TRANSACTION FIREBASE) ---
         function confirmVote() {
             db.ref('votingConfig').once('value', (snapshot) => {
                 const config = snapshot.val() || { isOpen: false };
@@ -788,20 +815,25 @@
                 }
 
                 db.ref('voters/' + currentUser.nis).set(true).then(() => {
+                    // Penanganan aman transaksi agar tidak error jika node 'votes' belum terbentuk
                     db.ref('votes/' + selectedCandidateId).transaction((currentVotes) => {
                         return (currentVotes || 0) + 1;
-                    }, () => {
-                        // SET DIGITAL RECEIPT DATA
-                        const now = new Date();
-                        const timeStr = now.toLocaleDateString('id-ID') + ' ' + now.toLocaleTimeString('id-ID');
-                        const randomHash = 'SNT-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+                    }, (error, committed) => {
+                        if (error) {
+                            alert("Gagal mencatat suara: " + error.message);
+                        } else if (committed) {
+                            // SET DIGITAL RECEIPT DATA
+                            const now = new Date();
+                            const timeStr = now.toLocaleDateString('id-ID') + ' ' + now.toLocaleTimeString('id-ID');
+                            const randomHash = 'SNT-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
-                        document.getElementById('receipt-nama').innerText = currentUser.nama;
-                        document.getElementById('receipt-nis').innerText = currentUser.nis;
-                        document.getElementById('receipt-time').innerText = timeStr;
-                        document.getElementById('receipt-token').innerText = 'TOKEN: ' + randomHash;
+                            document.getElementById('receipt-nama').innerText = currentUser.nama;
+                            document.getElementById('receipt-nis').innerText = currentUser.nis;
+                            document.getElementById('receipt-time').innerText = timeStr;
+                            document.getElementById('receipt-token').innerText = 'TOKEN: ' + randomHash;
 
-                        showPage('success-page');
+                            showPage('success-page');
+                        }
                     });
                 }).catch((error) => {
                     alert("Gagal mengirim suara: " + error.message);
@@ -955,15 +987,23 @@
             showPage('login-page');
         }
 
+        // --- RESET DATA DENGAN PASSWORD AZAM101 ---
         function resetData() {
-            if(confirm("PERINGATAN! Ini akan menghapus seluruh data suara di server. Lanjutkan?")) {
-                let doubleCheck = prompt("Ketik 'RESET' untuk mengonfirmasi penghapusan:");
-                if (doubleCheck === 'RESET') {
+            if (confirm("PERINGATAN! Tindakan ini akan menghapus seluruh data suara dan daftar siswa yang sudah memilih dari server.")) {
+                let adminPassword = prompt("Masukkan Kata Sandi Admin untuk mengonfirmasi reset:");
+                
+                if (adminPassword === null) {
+                    alert("Reset dibatalkan.");
+                    return;
+                }
+                
+                // Kata sandi reset disesuaikan menjadi: azam101
+                if (adminPassword === "azam101") {
                     db.ref('votes').set({ 1: 0, 2: 0 });
                     db.ref('voters').remove();
-                    alert("Seluruh data voting telah direset dari server.");
+                    alert("Verifikasi berhasil! Seluruh data voting telah direset dari server.");
                 } else {
-                    alert("Reset dibatalkan.");
+                    alert("Reset gagal! Kata sandi admin yang Anda masukkan salah.");
                 }
             }
         }
