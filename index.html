@@ -1,35 +1,842 @@
 <!doctype html>
 <html lang="id">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#111827"><title>E-Voting OSIS SNT</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ffffff"><title>E-Voting OSIS SNT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <style>
-:root{--ink:#111827;--bg:#f3f6fb;--card:#fff;--line:#e5e7eb;--muted:#64748b;--gold:#f59e0b;--green:#10b981;--red:#ef4444;--shadow:0 18px 55px #0f172a14}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 10% 0,#e5edff,transparent 35%),var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}.hidden{display:none!important}.hero{position:relative;text-align:center;color:#fff;padding:28px 18px 24px;background:linear-gradient(135deg,#0f172a,#334155);border-bottom:4px solid var(--gold)}.logo{width:82px;height:82px;object-fit:contain;filter:drop-shadow(0 8px 15px #0006)}.hero h1{margin:8px 0 3px;font-size:clamp(21px,4vw,30px)}.hero p{margin:0;color:#cbd5e1;font-size:13px}.theme{position:absolute;right:18px;top:18px;border:1px solid #fff4;background:#fff1;color:#fff;border-radius:10px;width:38px;height:38px}.top{display:flex;justify-content:center;gap:8px;background:#0b1220;color:#e5e7eb;padding:8px;font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:var(--green);margin-top:5px}.offline .dot{background:var(--red)}.banner{text-align:center;padding:10px;font-size:13px;font-weight:800;color:#fff;background:#b91c1c}.banner.open{background:linear-gradient(90deg,#059669,#10b981)}main{max-width:1050px;margin:auto;padding:35px 16px 60px}.panel{max-width:520px;margin:auto;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:clamp(22px,4vw,38px);box-shadow:var(--shadow)}.wide{max-width:940px}.eyebrow{text-align:center;color:#d97706;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.title{text-align:center;margin:7px 0 23px;font-size:26px;letter-spacing:-.04em}.sub{text-align:center;color:var(--muted);font-size:13px;margin:-12px 0 24px}.field{margin:15px 0}.field label{display:block;color:var(--muted);font-size:12px;font-weight:800;margin-bottom:6px}.field input,.field select,.search{width:100%;padding:13px;border:1px solid var(--line);border-radius:11px;background:var(--bg);color:var(--ink);outline:0}.field input:focus,.field select:focus,.search:focus{border-color:var(--gold);box-shadow:0 0 0 4px #f59e0b22}.pass{position:relative}.pass input{padding-right:45px}.pass button{position:absolute;right:6px;top:6px;height:35px;width:36px;border:0;background:transparent;color:var(--muted)}.btn{border:0;border-radius:11px;min-height:45px;padding:12px 16px;font-weight:800;transition:.2s}.btn:hover{transform:translateY(-1px);filter:brightness(1.05)}.btn:disabled{opacity:.55;cursor:not-allowed}.full{width:100%}.primary{background:var(--ink);color:#fff}.green{background:var(--green);color:#fff}.gold{background:var(--gold);color:#422006}.red{background:var(--red);color:#fff}.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}.actions{display:flex;gap:10px;flex-wrap:wrap}.actions>*{flex:1}.note{display:flex;gap:9px;margin-top:17px;padding:11px;border:1px solid #fde68a;border-radius:11px;background:#fffbeb;color:#92400e;font-size:12px}.level-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}.level{padding:23px 15px;text-align:center;border:1px solid var(--line);border-radius:17px;background:var(--card);transition:.2s}.level:hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:0 12px 25px #0f172a12}.level-icon{font-size:40px}.level h3{margin:7px 0 3px}.level p{margin:0 0 15px;color:var(--muted);font-size:12px}.welcome{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;padding:16px 19px;border-radius:15px;background:linear-gradient(135deg,#0f172a,#334155);color:#fff}.welcome small{display:block;color:#cbd5e1}.level-pill{display:inline-block;margin-top:4px;padding:3px 8px;border-radius:99px;background:#fef3c7;color:#92400e;font-size:11px;font-weight:800}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:17px}.candidate{padding:19px;border:1px solid var(--line);border-radius:17px}.candidate h3{text-align:center;margin:0 0 15px}.people{display:flex;justify-content:center;gap:24px}.person{text-align:center;min-width:100px}.person img{width:83px;height:83px;border-radius:50%;object-fit:cover;border:3px solid #fef3c7}.person b,.person small{display:block}.person b{font-size:13px;margin-top:5px}.person small{font-size:11px;color:var(--muted)}.vision{padding:13px;margin:16px 0;border:1px solid var(--line);border-radius:11px;background:var(--bg);color:var(--muted);font-size:13px;text-align:center}.vision strong{display:block;color:var(--ink);font-size:11px;text-transform:uppercase;letter-spacing:.1em}.confirm{padding:20px;border:2px solid #fbbf24;border-radius:15px;text-align:center;margin-bottom:20px}.receipt{padding:19px;margin:19px 0;border:2px dashed var(--line);border-radius:15px}.row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}.row strong{color:var(--ink);text-align:right}.token{padding:10px;margin-top:14px;border-radius:9px;background:var(--bg);text-align:center;font:700 13px monospace;letter-spacing:1px}.section{padding:19px;margin:17px 0;border:1px solid var(--line);border-radius:16px}.section h3{margin:0 0 14px;font-size:14px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{text-align:center;padding:14px 8px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}.stat b{display:block;font-size:24px}.stat small{color:var(--muted);font-size:10px;font-weight:800}.progress{height:10px;border-radius:99px;background:var(--line);overflow:hidden}.progress i{display:block;height:100%;background:linear-gradient(90deg,#10b981,#34d399)}.winner{text-align:center;background:#fffbeb;color:#92400e;padding:12px;border-radius:10px;font-weight:800;margin-bottom:14px}.students{max-height:240px;overflow:auto;border:1px solid var(--line);border-radius:10px}.student{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);font-size:13px}.badge{padding:3px 7px;border-radius:6px;font-size:10px;font-weight:800;white-space:nowrap}.yes{background:#d1fae5;color:#065f46}.no{background:#fee2e2;color:#991b1b}.toast{position:fixed;right:17px;bottom:17px;z-index:20;background:#111827;color:#fff;border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);font-size:13px}@media(max-width:600px){.level-grid,.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:span 2}.actions{flex-direction:column}.welcome{align-items:flex-start;flex-direction:column}}
-[data-theme=dark]{--bg:#0b1220;--card:#111827;--line:#263449;--muted:#94a3b8;--ink:#f8fafc;color-scheme:dark}
+:root{
+  --navy:#0b1024;--navy2:#161d3d;--ink:#161a2e;--bg:#f4f2ec;--card:#ffffff;--line:#e7e3d8;--muted:#6b6f80;
+  --gold:#c8962c;--gold-deep:#9c7220;--green:#2f8f5b;--red:#c4432f;
+  --shadow:0 24px 60px -20px rgba(11,16,36,.28);--radius:18px;
+  --serif:'Fraunces',Georgia,serif;--sans:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;
+}
+[data-theme=dark]{--navy:#05070f;--navy2:#0d1226;--ink:#eef0f7;--bg:#0a0d1c;--card:#121631;--line:#232a4d;--muted:#9aa0c0;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans)}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+a{color:inherit}
+
+/* header / ballot masthead */
+.hero{position:relative;text-align:center;color:var(--ink);padding:24px 18px 20px;background:#ffffff;border-bottom:3px solid var(--gold);overflow:hidden}
+.hero-banner-img{max-width:100%;width:420px;height:auto;object-fit:contain;display:block;margin:0 auto 12px}
+.hero h1{margin:10px 0 2px;font:700 clamp(20px,4vw,28px)/1.15 var(--serif);letter-spacing:-.01em;color:#0b1024}
+.hero p{margin:0;color:var(--muted);font-size:13px;letter-spacing:.02em;font-weight:600}
+.theme{position:absolute;right:16px;top:16px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;width:38px;height:38px}
+.theme:hover{background:var(--line)}
+
+.top{display:flex;justify-content:center;align-items:center;gap:8px;background:var(--navy);color:#cfd2e6;padding:7px;font-size:12px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.offline .dot{background:var(--red)}
+.banner{text-align:center;padding:11px;font:700 13px/1.3 var(--sans);color:#fff;background:#8a3226;letter-spacing:.01em}
+.banner.open{background:linear-gradient(90deg,#1f7a4d,#2f8f5b)}
+.banner.warn{background:linear-gradient(90deg,#9c6a15,#c8962c)}
+
+main{max-width:1080px;margin:auto;padding:36px 16px 70px}
+.panel{max-width:540px;margin:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:clamp(22px,4vw,40px);box-shadow:var(--shadow)}
+.wide{max-width:960px}
+.eyebrow{text-align:center;color:var(--gold-deep);font-size:11.5px;font-weight:700;letter-spacing:.06em}
+.title{text-align:center;margin:6px 0 22px;font:700 clamp(22px,3.4vw,28px)/1.2 var(--serif);letter-spacing:-.01em}
+.sub{text-align:center;color:var(--muted);font-size:13px;margin:-12px 0 22px}
+.field{margin:15px 0}
+.field label{display:block;color:var(--muted);font-size:12px;font-weight:700;margin-bottom:6px}
+.field input,.field select,.search,.field textarea{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:11px;background:var(--bg);color:var(--ink);outline:0}
+.field input:focus,.field select:focus,.search:focus,.field textarea:focus{border-color:var(--gold);box-shadow:0 0 0 4px #c8962c22}
+.pass{position:relative}
+.pass input{padding-right:45px}
+.pass button{position:absolute;right:6px;top:6px;height:35px;width:36px;border:0;background:transparent;color:var(--muted);border-radius:8px}
+.pass button:hover{background:var(--line)}
+.btn{border:0;border-radius:11px;min-height:44px;padding:11px 16px;font-weight:700;transition:.15s ease;font-size:13.5px}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.06)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.full{width:100%}
+.primary{background:var(--navy);color:#f6f4ea}
+.green{background:var(--green);color:#fff}
+.gold{background:var(--gold);color:#2b1e05}
+.red{background:var(--red);color:#fff}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.ghost:hover{background:var(--line)}
+.small-btn{min-height:32px;padding:6px 11px;font-size:12px;border-radius:8px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.actions>*{flex:1}
+.link-btn{background:none;border:0;color:var(--gold-deep);font-weight:700;font-size:12.5px;text-decoration:underline;padding:0}
+.note{display:flex;gap:9px;margin-top:16px;padding:11px 12px;border:1px solid #d8b26a55;border-radius:11px;background:#c8962c14;color:var(--gold-deep);font-size:12px}
+[data-theme=dark] .note{color:#e8c878}
+
+.level-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}
+.level{padding:26px 15px;text-align:center;border:1px solid var(--line);border-radius:16px;background:var(--card);transition:.18s}
+.level:hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:0 14px 28px -12px #0f172a26}
+.level-icon{width:46px;height:46px;margin:0 auto 8px;color:var(--gold-deep)}
+.level h3{margin:6px 0 3px;font-family:var(--serif)}
+.level p{margin:0 0 15px;color:var(--muted);font-size:12px}
+
+.welcome{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;padding:16px 19px;border-radius:15px;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#f6f4ea}
+.welcome small{display:block;color:#c7cadf}
+.welcome b{font-family:var(--serif);font-size:17px}
+.level-pill{display:inline-block;margin-top:5px;padding:3px 9px;border-radius:99px;background:#c8962c;color:#2b1e05;font-size:10.5px;font-weight:800;letter-spacing:.03em}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:17px}
+.candidate{position:relative;padding:20px;border:1px solid var(--line);border-radius:16px;background:var(--card);display:flex;flex-direction:column}
+.candidate h3{text-align:center;margin:0 0 15px;font-family:var(--serif);font-size:19px}
+.cand-number{position:absolute;top:14px;left:14px;width:34px;height:34px;border-radius:50%;background:var(--navy);color:#f6f4ea;display:flex;align-items:center;justify-content:center;font:800 15px var(--serif)}
+.confirm .cand-number{position:static;display:inline-flex;margin-bottom:8px}
+.people{display:flex;justify-content:center;gap:22px}
+.person{text-align:center;min-width:100px}
+.person img{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #c8962c55}
+.person b,.person small{display:block}
+.person b{font-size:13px;margin-top:6px}
+.person small{font-size:11px;color:var(--muted)}
+.vision{padding:13px;margin:16px 0;border-left:3px solid var(--gold);border-radius:0 10px 10px 0;background:var(--bg);color:var(--muted);font-size:13px;font-style:italic}
+.vision strong{display:block;color:var(--ink);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;font-style:normal;margin-bottom:4px}
+.candidate .btn{margin-top:auto}
+
+.confirm{padding:20px;border:2px solid var(--gold);border-radius:15px;text-align:center;margin-bottom:20px}
+.receipt{padding:19px;margin:19px 0;border:2px dashed var(--line);border-radius:15px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+.row strong{color:var(--ink);text-align:right}
+.token{padding:11px;margin-top:14px;border-radius:9px;background:var(--bg);text-align:center;font:700 13px monospace;letter-spacing:1px}
+#qrcode{display:flex;justify-content:center;margin-top:14px}
+#qrcode img,#qrcode canvas{border-radius:8px;background:#fff;padding:8px}
+
+.section{padding:19px;margin:17px 0;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+.section h3{margin:0 0 14px;font-size:14px;font-family:var(--serif);font-size:16px}
+.section h4{margin:18px 0 10px;font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{text-align:center;padding:14px 8px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.stat b{display:block;font-size:24px;font-family:var(--serif)}
+.stat small{color:var(--muted);font-size:10px;font-weight:700}
+.progress{height:9px;border-radius:99px;background:var(--line);overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,#2f8f5b,#59b381)}
+.winner{text-align:center;background:#c8962c1a;color:var(--gold-deep);padding:12px;border-radius:10px;font-weight:800;margin-bottom:14px}
+[data-theme=dark] .winner{color:#e8c878}
+
+.students{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+.student{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);font-size:13px}
+.student:last-child{border-bottom:0}
+.student-actions{display:flex;gap:6px;flex-shrink:0}
+.badge{padding:3px 8px;border-radius:6px;font-size:10px;font-weight:800;white-space:nowrap}
+.yes{background:#d9f0e2;color:#1f6b45}
+.no{background:#f6dcd7;color:#8a3226}
+[data-theme=dark] .yes{background:#12331f;color:#7cd6a0}
+[data-theme=dark] .no{background:#3a1a15;color:#e69a8a}
+
+.kelas-bars{display:flex;flex-direction:column;gap:9px}
+.kelas-row{display:grid;grid-template-columns:90px 1fr 60px;align-items:center;gap:10px;font-size:12px}
+.kelas-row .progress{height:8px}
+
+.cand-admin{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;background:var(--bg)}
+.cand-admin .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.log-list{max-height:180px;overflow:auto;font-size:12px;color:var(--muted)}
+.log-item{padding:7px 0;border-bottom:1px solid var(--line)}
+.log-item:last-child{border-bottom:0}
+.log-item b{color:var(--ink)}
+
+.toast{position:fixed;right:17px;bottom:17px;z-index:30;background:var(--navy);color:#f6f4ea;border-radius:10px;padding:13px 16px;box-shadow:var(--shadow);font-size:13px;max-width:280px;display:flex;align-items:center;gap:10px}
+.toast button{flex-shrink:0;background:var(--gold);color:#2b1e05;border:0;border-radius:8px;padding:6px 10px;font-weight:800;font-size:12px}
+.faq-item{border-bottom:1px solid var(--line);padding:14px 0}
+.faq-item:last-child{border-bottom:0}
+.faq-item b{display:block;font-family:var(--serif);font-size:15px;margin-bottom:5px}
+.faq-item p{margin:0;color:var(--muted);font-size:13px}
+.admin-account{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);font-size:13px}
+.admin-account:last-child{border-bottom:0}
+.cand-preview-wrap{margin:16px 0;padding:14px;border:1px dashed var(--line);border-radius:14px;background:var(--bg)}
+.cand-preview-wrap h4{margin-top:0}
+.schedule-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.modal-bg{position:fixed;inset:0;background:#0b102499;z-index:40;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:var(--card);border-radius:16px;padding:24px;max-width:420px;width:100%;box-shadow:var(--shadow);max-height:88vh;overflow:auto}
+.modal h3{margin-top:0;font-family:var(--serif)}
+.tag-row{display:flex;gap:8px;margin-bottom:14px}
+.tag-row button{flex:1}
+.tab-btn{background:transparent;border:1px solid var(--line);border-radius:99px;padding:9px;font-weight:700;color:var(--muted)}
+.tab-btn.active{background:var(--navy);color:#f6f4ea;border-color:var(--navy)}
+
+@media print{
+  body *{visibility:hidden}
+  #success-page,#success-page *{visibility:visible}
+  #success-page{position:absolute;left:0;top:0;width:100%;box-shadow:none;border:none}
+  .actions,.theme{display:none!important}
+}
+@media(max-width:600px){.level-grid,.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:span 2}.actions{flex-direction:column}.welcome{align-items:flex-start;flex-direction:column}.cand-admin .grid2{grid-template-columns:1fr}}
 </style></head>
 <body>
-<header class="hero"><button class="theme" id="themeBtn" aria-label="Ganti tema">☾</button><img class="logo" src="https://iili.io/n28EQJ2.png" alt="Logo SNT"><h1>Sekolah Nasional Terintegrasi</h1><p>Pemilihan Ketua & Wakil OSIS · Periode 2026/2027</p></header>
-<div class="top" id="network"><i class="dot"></i><span id="networkText">Memeriksa koneksi server…</span></div><div id="banner" class="banner">🔒 VOTING SEDANG DITUTUP</div>
+<header class="hero">
+  <button class="theme" id="themeBtn" aria-label="Ganti tema">☾</button>
+  <img class="hero-banner-img" src="https://i.ibb.co.com/hRzW8MmJ/file-00000000d19881fa978d5f8b2e086c7c.png" alt="Sekolah Nasional Terintegrasi 17 Tanjung Jabung Timur">
+  <h1>Pemilihan Ketua &amp; Wakil OSIS</h1>
+  <p>Periode 2026/2027</p>
+</header>
+<div class="top" id="network"><i class="dot"></i><span id="networkText">Memeriksa koneksi server…</span></div>
+<div id="banner" class="banner" aria-live="polite">🔒 VOTING SEDANG DITUTUP</div>
+
 <main>
-<section id="level-page" class="panel"><div class="eyebrow">Portal pemilihan OSIS</div><h2 class="title">Pilih jenjangmu</h2><p class="sub">Setiap jenjang memiliki calon, sesi, dan hasil voting yang terpisah.</p><div class="level-grid"><article class="level"><div class="level-icon">🎒</div><h3>OSIS SMP</h3><p>Pemilihan Ketua & Wakil OSIS SMP</p><button class="btn primary full" onclick="chooseLevel('smp')">Masuk SMP →</button></article><article class="level"><div class="level-icon">🎓</div><h3>OSIS SMA</h3><p>Pemilihan Ketua & Wakil OSIS SMA</p><button class="btn gold full" onclick="chooseLevel('sma')">Masuk SMA →</button></article></div><div class="note">🔐 Data suara SMP dan SMA disimpan pada ruang database yang berbeda.</div></section>
-<section id="login-page" class="panel hidden"><div class="welcome"><div><small>Jenjang aktif</small><b id="login-level"></b></div><button class="btn ghost" onclick="showPage('level-page')">Ganti</button></div><h2 class="title">Masuk ke bilik suara</h2><p class="sub">Gunakan NIS dan password yang diberikan panitia.</p><div class="field"><label for="nis">NIS atau email admin</label><input id="nis" autocomplete="username" maxlength="80" placeholder="Contoh: 1001"></div><div class="field"><label for="password">Password</label><div class="pass"><input id="password" type="password" autocomplete="current-password" maxlength="100"><button type="button" onclick="togglePassword()">◉</button></div></div><button class="btn primary full" id="loginBtn" onclick="login()">Masuk dengan aman →</button><div class="note">🔐 Suara hanya dapat dikirim satu kali. Jangan bagikan password.</div></section>
-<section id="candidates-page" class="panel wide hidden"><div class="welcome"><div><small id="welcome-level"></small><b id="welcome-msg"></b><span class="level-pill" id="level-pill"></span></div><button class="btn ghost" onclick="logout()">Keluar</button></div><h2 class="title">Pilih pasangan calon</h2><p class="sub">Baca visi setiap pasangan sebelum memilih.</p><div id="candidates-list" class="cards"></div></section>
-<section id="confirmation-page" class="panel hidden"><div class="eyebrow">Langkah terakhir</div><h2 class="title">Konfirmasi pilihan</h2><p class="sub">Pilihan tidak dapat diubah setelah dikirim.</p><div id="confirm-details"></div><div class="actions"><button class="btn green" id="confirmBtn" onclick="confirmVote()">✓ Kirim suara</button><button class="btn ghost" onclick="showPage('candidates-page')">Kembali</button></div></section>
-<section id="success-page" class="panel hidden" style="text-align:center"><div style="font-size:52px">✅</div><h2 class="title">Voting berhasil!</h2><p class="sub">Hak suara telah tercatat pada pemilihan <b id="receipt-level"></b>.</p><div class="receipt"><b>🎟️ BUKTI SUARA DIGITAL SNT</b><div class="row"><span>Nama</span><strong id="receipt-nama">-</strong></div><div class="row"><span>NIS</span><strong id="receipt-nis">-</strong></div><div class="row"><span>Waktu</span><strong id="receipt-time">-</strong></div><div class="token" id="receipt-token">TOKEN: -</div></div><div class="actions"><button class="btn gold" onclick="copyReceipt()">Salin token</button><button class="btn primary" onclick="logout()">Selesai & keluar</button></div></section>
-<section id="admin-page" class="panel wide hidden"><div class="welcome"><div><small>Dashboard panitia</small><b>Kontrol pemilihan realtime</b></div><button class="btn ghost" onclick="logout()">Keluar</button></div><div class="section"><h3>🎛️ Kelola jenjang</h3><select id="admin-level" class="search" onchange="setAdminLevel(this.value)"><option value="smp">OSIS SMP</option><option value="sma">OSIS SMA</option></select></div><div class="section"><h3>⚙️ Sesi <span id="admin-level-label">SMP</span></h3><div class="actions"><input id="duration" class="search" type="number" min="1" max="1440" placeholder="Durasi menit"><button class="btn green" onclick="openVoting()">Buka voting</button><button class="btn red" onclick="closeVoting()">Tutup voting</button></div></div><div class="section"><h3>📊 Statistik <span id="stats-level-label">SMP</span></h3><div id="admin-winner" class="winner">Memuat hasil…</div><div class="stats"><div class="stat"><b id="stat-total">0</b><small>TOTAL SISWA</small></div><div class="stat"><b id="stat-voted" style="color:var(--green)">0</b><small>SUDAH MEMILIH</small></div><div class="stat"><b id="stat-unvoted" style="color:var(--red)">0</b><small>BELUM MEMILIH</small></div></div><p style="color:var(--muted);font-size:12px;display:flex;justify-content:space-between"><b>Partisipasi</b><b id="turnout">0%</b></p><div class="progress"><i id="turnout-bar"></i></div></div><div class="section"><h3>👥 Status siswa</h3><input id="search" class="search" oninput="filterStudents()" placeholder="Cari NIS atau nama…"><div id="student-list" class="students" style="margin-top:12px"></div></div><div class="section"><div style="display:flex;justify-content:space-between"><h3>📈 Grafik hasil</h3><select id="chartType" class="search" style="width:auto;padding:7px" onchange="renderAdmin()"><option value="doughnut">Donat</option><option value="bar">Batang</option></select></div><canvas id="chart"></canvas></div><div class="actions"><button class="btn ghost" onclick="exportCSV()">⇩ Ekspor CSV</button><button class="btn red" onclick="resetData()">Reset jenjang ini</button></div></section>
-</main><div id="toast" class="toast hidden"></div>
+<section id="level-page" class="panel">
+  <div class="eyebrow">PORTAL PEMILIHAN OSIS</div>
+  <h2 class="title">Pilih jenjangmu</h2>
+  <p class="sub">Setiap jenjang memiliki calon, sesi, dan hasil voting yang terpisah.</p>
+  <div class="level-grid">
+    <article class="level">
+      <svg class="level-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19V9l8-4 8 4v10"/><path d="M9 21v-6h6v6"/><path d="M4 9l8 4 8-4"/></svg>
+      <h3>OSIS SMP</h3><p>Pemilihan Ketua &amp; Wakil OSIS SMP</p>
+      <button class="btn primary full" onclick="chooseLevel('smp')">Masuk SMP →</button>
+    </article>
+    <article class="level">
+      <svg class="level-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 10L12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>
+      <h3>OSIS SMA</h3><p>Pemilihan Ketua &amp; Wakil OSIS SMA</p>
+      <button class="btn gold full" onclick="chooseLevel('sma')">Masuk SMA →</button>
+    </article>
+  </div>
+  <div class="note">Data suara SMP dan SMA disimpan pada ruang tersendiri.</div>
+  <div style="text-align:center;margin-top:14px"><button class="link-btn" onclick="showPage('faq-page')">❓ FAQ Voting</button></div>
+</section>
+
+<section id="faq-page" class="panel hidden">
+  <div class="eyebrow">PERTANYAAN UMUM</div>
+  <h2 class="title">FAQ Voting OSIS</h2>
+  <div id="faq-list"><p class="sub">Memuat FAQ…</p></div>
+  <button class="btn ghost full" style="margin-top:18px" onclick="showPage('level-page')">← Kembali</button>
+</section>
+
+<section id="login-page" class="panel hidden">
+  <div class="welcome"><div><small>Jenjang aktif</small><b id="login-level"></b></div><button class="btn ghost small-btn" onclick="showPage('level-page')">Ganti</button></div>
+  <h2 class="title">Masuk ke bilik suara</h2>
+  <p class="sub">Gunakan NIS dan password yang diberikan panitia.</p>
+  <div class="field"><label for="nis">NIS (atau NIS panitia untuk admin)</label><input id="nis" autocomplete="username" maxlength="80" placeholder="Contoh: 1001"></div>
+  <div class="field"><label for="password">Password</label><div class="pass"><input id="password" type="password" autocomplete="current-password" maxlength="100"><button type="button" onclick="togglePassword()">◉</button></div></div>
+  <button class="btn primary full" id="loginBtn" onclick="login()">Masuk →</button>
+  <div style="text-align:center;margin-top:12px"><button class="link-btn" onclick="showForgot()">Lupa password?</button></div>
+  <div class="note">Suara hanya dapat dikirim satu kali. Jangan bagikan password.</div>
+</section>
+
+<section id="candidates-page" class="panel wide hidden">
+  <div class="welcome"><div><small id="welcome-level"></small><b id="welcome-msg"></b><span class="level-pill" id="level-pill"></span></div><button class="btn ghost small-btn" onclick="logout()">Keluar</button></div>
+  <h2 class="title">Pilih pasangan calon</h2>
+  <p class="sub">Baca visi setiap pasangan sebelum memilih.</p>
+  <div id="candidates-list" class="cards"></div>
+</section>
+
+<section id="confirmation-page" class="panel hidden">
+  <div class="eyebrow">LANGKAH TERAKHIR</div>
+  <h2 class="title">Konfirmasi pilihan</h2>
+  <p class="sub">Pilihan tidak dapat diubah setelah dikirim.</p>
+  <div id="confirm-details"></div>
+  <div id="pin-field" class="field hidden"><label for="pinInput">Kode konfirmasi dari wali kelas/guru BK</label><input id="pinInput" placeholder="Masukkan kode yang diberikan"></div>
+  <div class="actions"><button class="btn green" id="confirmBtn" onclick="confirmVote()">✓ Kirim suara</button><button class="btn ghost" onclick="showPage('candidates-page')">Kembali</button></div>
+</section>
+
+<section id="success-page" class="panel hidden" style="text-align:center">
+  <div style="font-size:48px">✅</div>
+  <h2 class="title">Voting berhasil!</h2>
+  <p class="sub">Hak suara telah tercatat pada pemilihan <b id="receipt-level"></b>.</p>
+  <div class="receipt">
+    <b>BUKTI SUARA DIGITAL SNT</b>
+    <div class="row"><span>Nama</span><strong id="receipt-nama">-</strong></div>
+    <div class="row"><span>NIS</span><strong id="receipt-nis">-</strong></div>
+    <div class="row"><span>Waktu</span><strong id="receipt-time">-</strong></div>
+    <div class="token" id="receipt-token">TOKEN: -</div>
+    <div id="qrcode"></div>
+  </div>
+  <div class="actions">
+    <button class="btn gold" onclick="copyReceipt()">Salin token</button>
+    <button class="btn ghost" onclick="printReceipt()">🖨 Cetak / PDF</button>
+    <button class="btn primary" onclick="logout()">Selesai &amp; keluar</button>
+  </div>
+</section>
+
+<section id="admin-page" class="panel wide hidden">
+  <div class="welcome"><div><small>Dashboard panitia</small><b>Kontrol pemilihan realtime</b></div><button class="btn ghost small-btn" onclick="logout()">Keluar</button></div>
+
+  <div class="section"><h3>Kelola jenjang</h3>
+    <select id="admin-level" class="search" onchange="setAdminLevel(this.value)"><option value="smp">OSIS SMP</option><option value="sma">OSIS SMA</option></select>
+  </div>
+
+  <div class="section"><h3>Sesi <span id="admin-level-label">SMP</span></h3>
+    <div class="field"><label>Kode konfirmasi (opsional — dibagikan wali kelas/guru BK ke siswa sebelum vote)</label><input id="pinCode" class="search" placeholder="Contoh: BK2026"></div>
+    <div class="actions"><input id="duration" class="search" type="number" min="1" max="1440" placeholder="Durasi menit (kosongkan = tanpa batas)"><button class="btn green" onclick="openVoting()">Buka voting sekarang</button><button class="btn red" onclick="closeVoting()">Tutup voting</button></div>
+    <h4>Jadwalkan pembukaan otomatis (opsional)</h4>
+    <div class="schedule-row"><input id="scheduleTime" class="search" type="datetime-local"><button class="btn ghost" onclick="scheduleVoting()">Jadwalkan</button></div>
+  </div>
+
+  <div class="section"><h3>Statistik <span id="stats-level-label">SMP</span></h3>
+    <div id="admin-winner" class="winner">Memuat hasil…</div>
+    <div class="stats">
+      <div class="stat"><b id="stat-total">0</b><small>TOTAL SISWA</small></div>
+      <div class="stat"><b id="stat-voted" style="color:var(--green)">0</b><small>SUDAH MEMILIH</small></div>
+      <div class="stat"><b id="stat-unvoted" style="color:var(--red)">0</b><small>BELUM MEMILIH</small></div>
+    </div>
+    <p style="color:var(--muted);font-size:12px;display:flex;justify-content:space-between;margin-top:14px"><b>Partisipasi</b><b id="turnout">0%</b></p>
+    <div class="progress"><i id="turnout-bar"></i></div>
+    <h4>Partisipasi per kelas</h4>
+    <div class="kelas-bars" id="kelas-bars"></div>
+  </div>
+
+  <div class="section"><h3>Grafik hasil</h3>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:8px"><select id="chartType" class="search" style="width:auto;padding:7px" onchange="renderChart()"><option value="doughnut">Donat</option><option value="bar">Batang</option></select></div>
+    <canvas id="chart"></canvas>
+  </div>
+
+  <div class="section"><h3>Tren voting per jam</h3>
+    <p class="sub" style="text-align:left;margin:0 0 12px">Menunjukkan jam berapa saja siswa paling banyak memilih.</p>
+    <canvas id="trendChart"></canvas>
+  </div>
+
+  <div class="section">
+    <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">Pasangan calon</h3><button class="btn gold small-btn" onclick="openCandidateModal()">+ Tambah paslon</button></div>
+    <div id="admin-candidates" style="margin-top:12px"></div>
+  </div>
+
+  <div class="section">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><h3 style="margin:0">Data siswa</h3>
+      <div class="actions" style="flex:none">
+        <button class="btn gold small-btn" onclick="openStudentModal()">+ Tambah siswa</button>
+        <label class="btn ghost small-btn" style="margin:0">⇧ Impor CSV<input type="file" accept=".csv,text/csv" onchange="importCSV(event)" style="display:none"></label>
+      </div>
+    </div>
+    <p class="sub" style="margin:10px 0 0;text-align:left">Format CSV: <code>nis,nama,password,kelas</code> — satu baris per siswa.</p>
+    <div class="schedule-row" style="margin-top:12px">
+      <input id="search" class="search" oninput="filterStudents()" placeholder="Cari NIS atau nama…">
+      <select id="filterKelas" class="search" onchange="filterStudents()"><option value="">Semua kelas</option></select>
+    </div>
+    <div id="student-list" class="students" style="margin-top:12px"></div>
+  </div>
+
+  <div class="section">
+    <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">FAQ Voting (berlaku semua jenjang)</h3><button class="btn gold small-btn" onclick="openFaqModal()">+ Tambah FAQ</button></div>
+    <div id="admin-faq" style="margin-top:12px"></div>
+  </div>
+
+  <div class="section">
+    <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">Akun panitia</h3><button class="btn gold small-btn" onclick="openAdminAccountModal()">+ Tambah akun</button></div>
+    <p class="sub" style="text-align:left;margin:10px 0">Akun utama (<code id="master-nis"></code>) tidak dapat dihapus. Tambahkan akun lain dengan nama berbeda agar tercatat di log aktivitas.</p>
+    <div id="admin-accounts"></div>
+  </div>
+
+  <div class="section">
+    <h3>Log aktivitas</h3>
+    <div id="log-list" class="log-list"></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn ghost" onclick="exportCSV()">⇩ Status siswa (CSV)</button>
+    <button class="btn gold" onclick="exportBeritaAcara()">📄 Berita Acara (PDF)</button>
+    <button class="btn red" onclick="resetData()">Reset suara jenjang ini</button>
+  </div>
+</section>
+</main>
+
+<div id="toast" class="toast hidden" aria-live="polite"></div>
+<div id="modal-root"></div>
+
 <script>
-const config={apiKey:"AIzaSyAjCJV16zCiOh764X4xoLUwbH58eKoIItI",authDomain:"vote-ketos-54b38.firebaseapp.com",databaseURL:"https://vote-ketos-54b38-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"vote-ketos-54b38",storageBucket:"vote-ketos-54b38.firebasestorage.app",messagingSenderId:"657876004266",appId:"1:657876004266:web:1311adce3ba3d9c6170fd3"};firebase.initializeApp(config);const db=firebase.database(),auth=firebase.auth(),$=id=>document.getElementById(id);let level=null,adminLevel='smp',user=null,selected=null,chart=null,voters={};
-const students={smp:[{nis:'1001',nama:'Budi Santoso',password:'123'},{nis:'1002',nama:'Siti Aminah',password:'123'}],sma:[{nis:'2001',nama:'Agus Wijaya',password:'123'},{nis:'2002',nama:'Dewi Lestari',password:'123'}]};
-const candidates={smp:[{id:1,label:'Paslon SMP 1',ketua:'Calon Ketua SMP 1',wakil:'Calon Wakil SMP 1',kelas:'VIII A',img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=compress&w=300',visi:'Mewujudkan OSIS SMP yang aktif, berprestasi, dan berkarakter.'},{id:2,label:'Paslon SMP 2',ketua:'Calon Ketua SMP 2',wakil:'Calon Wakil SMP 2',kelas:'VIII B',img:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=compress&w=300',visi:'Membangun sekolah SMP yang disiplin, kreatif, dan menyenangkan.'}],sma:[{id:1,label:'Paslon SMA 1',ketua:'Calon Ketua SMA 1',wakil:'Calon Wakil SMA 1',kelas:'XI IPA',img:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=compress&w=300',visi:'Mewujudkan OSIS SMA yang inovatif, aspiratif, dan unggul.'},{id:2,label:'Paslon SMA 2',ketua:'Calon Ketua SMA 2',wakil:'Calon Wakil SMA 2',kelas:'XI IPS',img:'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=compress&w=300',visi:'Menciptakan lingkungan SMA yang kolaboratif dan berprestasi.'}]};
-const path=(p='')=>db.ref(`elections/${level||adminLevel}/${p}`);function toast(x){$('toast').textContent=x;$('toast').classList.remove('hidden');clearTimeout(window.t);window.t=setTimeout(()=>$('toast').classList.add('hidden'),3500)}function showPage(id){document.querySelectorAll('.panel').forEach(x=>x.classList.add('hidden'));$(id).classList.remove('hidden');scrollTo(0,0)}function chooseLevel(x){level=x;$('login-level').textContent=x.toUpperCase();showPage('login-page')}function togglePassword(){let x=$('password');x.type=x.type==='password'?'text':'password'}function safe(x){return String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function renderCandidates(){let list=candidates[level];$('candidates-list').innerHTML=list.map(c=>`<article class="candidate"><h3>${safe(c.label)}</h3><div class="people"><div class="person"><img src="${c.img}" alt="Ketua ${safe(c.label)}"><b>${safe(c.ketua)}</b><small>${safe(c.kelas)}</small></div><div class="person"><img src="${c.img}" alt="Wakil ${safe(c.label)}"><b>${safe(c.wakil)}</b><small>${safe(c.kelas)}</small></div></div><div class="vision"><strong>Visi</strong>“${safe(c.visi)}”</div><button class="btn primary full" onclick="prepare(${c.id})">Pilih ${safe(c.label)} →</button></article>`).join('')}
-function prepare(id){selected=id;let c=candidates[level].find(x=>x.id===id);$('confirm-details').innerHTML=`<div class="confirm"><h3>${safe(c.label)}</h3><div class="people"><div class="person"><img src="${c.img}" alt=""><b>${safe(c.ketua)}</b><small>${safe(c.kelas)}</small></div><div class="person"><img src="${c.img}" alt=""><b>${safe(c.wakil)}</b><small>${safe(c.kelas)}</small></div></div></div>`;showPage('confirmation-page')}
-function login(){let id=$('nis').value.trim(),pass=$('password').value;if(!id||!pass)return toast('NIS/email dan password wajib diisi.');$('loginBtn').disabled=true;if(id.includes('@'))return auth.signInWithEmailAndPassword(id,pass).then(()=>{showPage('admin-page');renderAdmin();toast('Login admin berhasil')}).catch(()=>toast('Email atau password admin salah')).finally(()=>$('loginBtn').disabled=false);path('config').once('value').then(s=>{if(!(s.val()||{}).isOpen)throw'closed';let u=students[level].find(x=>x.nis===id&&x.password===pass);if(!u)throw'invalid';return path('voters/'+u.nis).once('value').then(v=>{if(v.exists())throw'voted';user=u;$('welcome-level').textContent='Pemilihan OSIS '+level.toUpperCase();$('welcome-msg').textContent=u.nama;$('level-pill').textContent=level.toUpperCase();renderCandidates();showPage('candidates-page')})}).catch(e=>toast(e==='closed'?'Voting '+level.toUpperCase()+' sedang ditutup.':e==='voted'?'Kamu sudah memilih.':'NIS atau password tidak sesuai.')).finally(()=>$('loginBtn').disabled=false)}
-function confirmVote(){if(!user||!selected||!navigator.onLine)return toast('Periksa koneksi internet.');$('confirmBtn').disabled=true;path('config').once('value').then(s=>{if(!(s.val()||{}).isOpen)throw'closed';return path('voters/'+user.nis).transaction(v=>v||{at:firebase.database.ServerValue.TIMESTAMP})}).then(r=>{if(!r.committed)throw'duplicate';return path('votes/'+selected).transaction(v=>(v||0)+1)}).then(r=>{if(!r.committed)throw'fail';$('receipt-level').textContent=level.toUpperCase();$('receipt-nama').textContent=user.nama;$('receipt-nis').textContent=user.nis;$('receipt-time').textContent=new Date().toLocaleString('id-ID');$('receipt-token').textContent='TOKEN: SNT-'+(crypto.randomUUID?crypto.randomUUID().slice(0,8):Math.random().toString(36).slice(2,10)).toUpperCase();showPage('success-page')}).catch(e=>toast(e==='closed'?'Voting sudah ditutup.':e==='duplicate'?'Suara sudah tercatat.':'Gagal mengirim suara.')).finally(()=>$('confirmBtn').disabled=false)}
-function updateBanner(c){let b=$('banner');if(!c||!c.isOpen){b.className='banner';b.textContent='🔒 VOTING SEDANG DITUTUP';return}if(c.endTime&&c.endTime-Date.now()<=0)return path('config').set({isOpen:false,endTime:null});b.className='banner open';let left=c.endTime?Math.max(0,Math.floor((c.endTime-Date.now())/1000)):0;b.textContent=c.endTime?`⏱️ VOTING ${level?level.toUpperCase():'OSIS'} DIBUKA · ${Math.floor(left/3600)}j ${Math.floor(left%3600/60)}m ${left%60}d`:'🔓 VOTING DIBUKA · Tanpa batas waktu'}db.ref('.info/connected').on('value',s=>{$('network').classList.toggle('offline',!s.val()||!navigator.onLine);$('networkText').textContent=s.val()&&navigator.onLine?'Terhubung ke server SNT':'Koneksi terputus — jangan kirim suara'});setInterval(()=>{if(level)path('config').once('value').then(s=>updateBanner(s.val()))},1000);
-function setAdminLevel(x){adminLevel=x;level=x;$('admin-level-label').textContent=x.toUpperCase();$('stats-level-label').textContent=x.toUpperCase();renderAdmin()}function filterStudents(){let q=$('search').value.toLowerCase();$('student-list').innerHTML=students[adminLevel].filter(s=>s.nis.includes(q)||s.nama.toLowerCase().includes(q)).map(s=>`<div class="student"><span><b>${safe(s.nama)}</b><br><small>NIS ${s.nis}</small></span><span class="badge ${voters[s.nis]?'yes':'no'}">${voters[s.nis]?'Sudah memilih':'Belum memilih'}</span></div>`).join('')||'<div class="student">Data tidak ditemukan.</div>'}
-function renderAdmin(){if($('admin-page').classList.contains('hidden'))return;path('config').once('value').then(s=>updateBanner(s.val()));path('').once('value').then(s=>{let d=s.val()||{},v=d.votes||{},a=+v[1]||0,b=+v[2]||0;voters=d.voters||{};let total=students[adminLevel].length,count=Object.keys(voters).length,p=total?count/total*100:0;$('stat-total').textContent=total;$('stat-voted').textContent=count;$('stat-unvoted').textContent=Math.max(0,total-count);$('turnout').textContent=p.toFixed(1)+'% ('+count+'/'+total+')';$('turnout-bar').style.width=p+'%';let sum=a+b,p1=sum?a/sum*100:0,p2=sum?b/sum*100:0;$('admin-winner').textContent=!sum?'📊 Belum ada suara yang masuk':a===b?'⚖️ Sementara imbang':`🏆 ${a>b?'PASLON 1':'PASLON 2'} memimpin (${Math.max(p1,p2).toFixed(1)}%)`;filterStudents();if(chart)chart.destroy();chart=new Chart($('chart'),{type:$('chartType').value,data:{labels:[`Paslon 1 (${p1.toFixed(1)}%)`,`Paslon 2 (${p2.toFixed(1)}%)`],datasets:[{data:[a,b],backgroundColor:['#111827','#f59e0b']}]},options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:$('chartType').value==='bar'?{y:{beginAtZero:true,ticks:{stepSize:1}}}:{}}})})}
-function openVoting(){let n=+ $('duration').value;path('config').set({isOpen:true,endTime:n>0?Date.now()+n*60000:null}).then(()=>toast('Sesi '+adminLevel.toUpperCase()+' dibuka.'))}function closeVoting(){if(confirm('Tutup voting jenjang ini?'))path('config').set({isOpen:false,endTime:null}).then(()=>toast('Voting ditutup.'))}function resetData(){if(confirm('Reset seluruh data jenjang '+adminLevel.toUpperCase()+'?'))path('').update({votes:{1:0,2:0},voters:null}).then(()=>toast('Data berhasil direset.'))}function exportCSV(){let rows=[['Nama','NIS','Status'],...students[adminLevel].map(s=>[s.nama,s.nis,voters[s.nis]?'Sudah memilih':'Belum memilih'])];let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.map(x=>x.join(',')).join('\n')],{type:'text/csv'}));a.download='status-'+adminLevel+'.csv';a.click()}function copyReceipt(){navigator.clipboard?.writeText($('receipt-token').textContent).then(()=>toast('Token disalin.'))}function logout(){auth.signOut().catch(()=>{});level=null;user=null;selected=null;$('nis').value='';$('password').value='';showPage('level-page')}
-$('themeBtn').onclick=()=>{let d=document.documentElement.dataset.theme!=='dark';document.documentElement.dataset.theme=d?'dark':'light';localStorage.setItem('theme',d?'dark':'light')};if(localStorage.getItem('theme')==='dark')document.documentElement.dataset.theme='dark';db.ref().on('value',()=>renderAdmin());
-</script></body></html>
+const config={apiKey:"AIzaSyAjCJV16zCiOh764X4xoLUwbH58eKoIItI",authDomain:"vote-ketos-54b38.firebaseapp.com",databaseURL:"https://vote-ketos-54b38-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"vote-ketos-54b38",storageBucket:"vote-ketos-54b38.firebasestorage.app",messagingSenderId:"657876004266",appId:"1:657876004266:web:1311adce3ba3d9c6170fd3"};
+firebase.initializeApp(config);
+const db=firebase.database(),$=id=>document.getElementById(id);
+const MASTER_ADMIN={nis:'panitiaosis123',pass:'246810',nama:'Panitia Utama'};
+let level=null,adminLevel='smp',isAdmin=false,user=null,selected=null,chart=null,trendChart=null;
+let studentsCache={smp:{},sma:{}},candidatesCache={smp:{},sma:{}},votersCache={},votesCache={};
+let warned5min=false,editingStudentNis=null,editingCandidateId=null,editingFaqId=null,editingAdminId=null;
+let adminsCache={},faqCache={},currentAdminName=MASTER_ADMIN.nama,currentConfig={},lastDeleted=null,scheduleChecked=false;
+
+const DEFAULT_STUDENTS={
+  smp:{'1001':{nama:'Budi Santoso',password:'123',kelas:'VII A'},'1002':{nama:'Siti Aminah',password:'123',kelas:'VII B'}},
+  sma:{'2001':{nama:'Agus Wijaya',password:'123',kelas:'X IPA 1'},'2002':{nama:'Dewi Lestari',password:'123',kelas:'X IPS 1'}}
+};
+const DEFAULT_CANDIDATES={
+  smp:{1:{label:'Paslon SMP 1',ketuaNama:'Calon Ketua SMP 1',ketuaFoto:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=compress&w=300',ketuaKelas:'VIII A',wakilNama:'Calon Wakil SMP 1',wakilFoto:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=compress&w=300',wakilKelas:'VIII B',visi:'Mewujudkan OSIS SMP yang aktif, berprestasi, dan berkarakter.'},2:{label:'Paslon SMP 2',ketuaNama:'Calon Ketua SMP 2',ketuaFoto:'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=compress&w=300',ketuaKelas:'VIII B',wakilNama:'Calon Wakil SMP 2',wakilFoto:'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=compress&w=300',wakilKelas:'VIII A',visi:'Membangun sekolah SMP yang disiplin, kreatif, dan menyenangkan.'}},
+  sma:{1:{label:'Paslon SMA 1',ketuaNama:'Calon Ketua SMA 1',ketuaFoto:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=compress&w=300',ketuaKelas:'XI IPA',wakilNama:'Calon Wakil SMA 1',wakilFoto:'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=compress&w=300',wakilKelas:'XI IPS',visi:'Mewujudkan OSIS SMA yang inovatif, aspiratif, dan unggul.'},2:{label:'Paslon SMA 2',ketuaNama:'Calon Ketua SMA 2',ketuaFoto:'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=compress&w=300',ketuaKelas:'XI IPS',wakilNama:'Calon Wakil SMA 2',wakilFoto:'https://images.unsplash.com/photo-1489980557514-251d61e3eeb6?auto=compress&w=300',wakilKelas:'XI IPA',visi:'Menciptakan lingkungan SMA yang kolaboratif dan berprestasi.'}}
+};
+
+const path=(lvl,p='')=>db.ref(`elections/${lvl}/${p}`);
+function toast(x,actionLabel,actionFn){
+  $('toast').innerHTML=`<span>${safe(x)}</span>`+(actionLabel?`<button id="toastAction">${safe(actionLabel)}</button>`:'');
+  if(actionLabel)$('toastAction').onclick=()=>{actionFn();$('toast').classList.add('hidden');};
+  $('toast').classList.remove('hidden');clearTimeout(window.t);window.t=setTimeout(()=>$('toast').classList.add('hidden'),actionLabel?6500:3800);
+}
+function showPage(id){document.querySelectorAll('main > .panel').forEach(x=>x.classList.add('hidden'));$(id).classList.remove('hidden');scrollTo(0,0)}
+function chooseLevel(x){level=x;$('login-level').textContent=x.toUpperCase();showPage('login-page')}
+function togglePassword(){let x=$('password');x.type=x.type==='password'?'text':'password'}
+function safe(x){return String(x==null?'':x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function showForgot(){toast('Hubungi panitia OSIS di sekolah untuk mengatur ulang passwordmu.')}
+
+function seedIfEmpty(lvl){
+  path(lvl,'students').once('value').then(s=>{if(!s.exists())path(lvl,'students').set(DEFAULT_STUDENTS[lvl])});
+  path(lvl,'candidates').once('value').then(s=>{if(!s.exists())path(lvl,'candidates').set(DEFAULT_CANDIDATES[lvl])});
+}
+seedIfEmpty('smp');seedIfEmpty('sma');
+
+function logAction(lvl,text){path(lvl,'logs').push({at:Date.now(),text});}
+function renderLogs(){
+  path(adminLevel,'logs').limitToLast(15).once('value').then(s=>{
+    let items=[];s.forEach(c=>items.push(c.val()));items.reverse();
+    $('log-list').innerHTML=items.length?items.map(it=>`<div class="log-item"><b>${new Date(it.at).toLocaleString('id-ID')}</b><br>${safe(it.text)}</div>`).join(''):'<div class="log-item">Belum ada aktivitas.</div>';
+  });
+}
+
+/* ---------- realtime listeners for both levels (kept warm) ---------- */
+['smp','sma'].forEach(lvl=>{
+  path(lvl,'students').on('value',s=>{studentsCache[lvl]=s.val()||{};if(level===lvl)renderCandidatesIfVisible();if(adminLevel===lvl&&isAdmin)filterStudents();});
+  path(lvl,'candidates').on('value',s=>{candidatesCache[lvl]=s.val()||{};if(level===lvl)renderCandidatesIfVisible();if(adminLevel===lvl&&isAdmin){renderAdminCandidates();renderChart();}});
+});
+function renderCandidatesIfVisible(){if(!$('candidates-page').classList.contains('hidden'))renderCandidates();}
+
+db.ref('admins').on('value',s=>{adminsCache=s.val()||{};if(isAdmin)renderAdminAccounts();});
+db.ref('faq').on('value',s=>{faqCache=s.val()||{};renderFaqPublic();if(isAdmin)renderAdminFaq();});
+function renderFaqPublic(){
+  let ids=Object.keys(faqCache);
+  $('faq-list').innerHTML=ids.length?ids.map(id=>`<div class="faq-item"><b>${safe(faqCache[id].q)}</b><p>${safe(faqCache[id].a)}</p></div>`).join(''):'<p class="sub">Belum ada FAQ yang ditambahkan panitia.</p>';
+}
+
+/* ---------- auth / login ---------- */
+function login(){
+  let id=$('nis').value.trim(),pass=$('password').value;
+  if(!id||!pass)return toast('NIS dan password wajib diisi.');
+  if(id===MASTER_ADMIN.nis&&pass===MASTER_ADMIN.pass){
+    isAdmin=true;currentAdminName=MASTER_ADMIN.nama;
+    sessionStorage.setItem('svote',JSON.stringify({isAdmin:true,adminLevel,adminName:currentAdminName}));
+    showPage('admin-page');setAdminLevel(adminLevel);toast('Login panitia berhasil');return;
+  }
+  let extraAdmin=Object.values(adminsCache).find(a=>a.nis===id&&a.pass===pass);
+  if(extraAdmin){
+    isAdmin=true;currentAdminName=extraAdmin.nama;
+    sessionStorage.setItem('svote',JSON.stringify({isAdmin:true,adminLevel,adminName:currentAdminName}));
+    showPage('admin-page');setAdminLevel(adminLevel);toast('Login panitia berhasil, halo '+extraAdmin.nama);return;
+  }
+  if(!level)return toast('Pilih jenjang terlebih dahulu.');
+  $('loginBtn').disabled=true;
+  path(level,'config').once('value').then(s=>{
+    if(!(s.val()||{}).isOpen)throw'closed';
+    let list=studentsCache[level]||{};let u=list[id];
+    if(!u)throw'notfound';
+    if(u.password!==pass)throw'wrongpass';
+    return path(level,'voters/'+id).once('value').then(v=>{
+      if(v.exists())throw'voted';
+      user={nis:id,nama:u.nama};
+      sessionStorage.setItem('svote',JSON.stringify({level,user}));
+      warned5min=false;
+      $('welcome-level').textContent='Pemilihan OSIS '+level.toUpperCase();
+      $('welcome-msg').textContent=u.nama;$('level-pill').textContent=level.toUpperCase();
+      renderCandidates();showPage('candidates-page');
+    });
+  }).catch(e=>toast(
+    e==='closed'?'Voting '+level.toUpperCase()+' sedang ditutup. Cek jadwal pada FAQ atau hubungi panitia.':
+    e==='voted'?'Kamu sudah memilih. Setiap siswa hanya bisa memilih satu kali.':
+    e==='notfound'?'NIS tidak terdaftar sebagai pemilih jenjang '+level.toUpperCase()+'. Hubungi panitia jika ini keliru.':
+    e==='wrongpass'?'Password salah. Coba lagi atau tekan "Lupa password?".':
+    'Terjadi kesalahan, coba lagi.'
+  )).finally(()=>$('loginBtn').disabled=false);
+}
+function logout(){isAdmin=false;level=null;user=null;selected=null;sessionStorage.removeItem('svote');$('nis').value='';$('password').value='';showPage('level-page');}
+
+function restoreSession(){
+  let raw=sessionStorage.getItem('svote');if(!raw)return;
+  try{
+    let s=JSON.parse(raw);
+    if(s.isAdmin){isAdmin=true;adminLevel=s.adminLevel||'smp';currentAdminName=s.adminName||MASTER_ADMIN.nama;setTimeout(()=>{showPage('admin-page');setAdminLevel(adminLevel);},300);}
+    else if(s.level&&s.user){level=s.level;user=s.user;warned5min=false;
+      setTimeout(()=>{$('welcome-level').textContent='Pemilihan OSIS '+level.toUpperCase();$('welcome-msg').textContent=user.nama;$('level-pill').textContent=level.toUpperCase();renderCandidates();showPage('candidates-page');},300);
+    }
+  }catch(e){}
+}
+
+/* ---------- voting flow ---------- */
+function renderCandidates(){
+  let list=candidatesCache[level]||{};
+  let html=Object.keys(list).map(id=>{
+    let c=list[id];
+    return `<article class="candidate"><span class="cand-number">${safe(id)}</span><h3>${safe(c.label)}</h3><div class="people">
+      <div class="person"><img src="${safe(c.ketuaFoto)}" alt="Ketua ${safe(c.label)}"><b>${safe(c.ketuaNama)}</b><small>Ketua · ${safe(c.ketuaKelas)}</small></div>
+      <div class="person"><img src="${safe(c.wakilFoto)}" alt="Wakil ${safe(c.label)}"><b>${safe(c.wakilNama)}</b><small>Wakil · ${safe(c.wakilKelas)}</small></div>
+      </div><div class="vision"><strong>Visi</strong>${safe(c.visi)}</div>
+      <button class="btn primary full" onclick="prepare('${id}')">Pilih Nomor ${safe(id)} →</button></article>`;
+  }).join('');
+  $('candidates-list').innerHTML=html||'<p class="sub">Belum ada pasangan calon untuk jenjang ini.</p>';
+}
+function prepare(id){
+  selected=id;let c=(candidatesCache[level]||{})[id];
+  $('confirm-details').innerHTML=`<div class="confirm"><span class="cand-number">${safe(id)}</span><h3>${safe(c.label)}</h3><div class="people">
+    <div class="person"><img src="${safe(c.ketuaFoto)}" alt=""><b>${safe(c.ketuaNama)}</b><small>Ketua · ${safe(c.ketuaKelas)}</small></div>
+    <div class="person"><img src="${safe(c.wakilFoto)}" alt=""><b>${safe(c.wakilNama)}</b><small>Wakil · ${safe(c.wakilKelas)}</small></div>
+    </div></div>`;
+  path(level,'config').once('value').then(s=>{
+    currentConfig=s.val()||{};
+    $('pin-field').classList.toggle('hidden',!currentConfig.pin);$('pinInput').value='';
+  });
+  showPage('confirmation-page');
+}
+function confirmVote(){
+  if(!user||!selected||!navigator.onLine)return toast('Periksa koneksi internet.');
+  if(currentConfig.pin&&$('pinInput').value.trim()!==currentConfig.pin)return toast('Kode konfirmasi salah. Minta kode ke wali kelas/guru BK.');
+  $('confirmBtn').disabled=true;
+  path(level,'config').once('value').then(s=>{
+    if(!(s.val()||{}).isOpen)throw'closed';
+    return path(level,'voters/'+user.nis).transaction(v=>v||{at:firebase.database.ServerValue.TIMESTAMP});
+  }).then(r=>{
+    if(!r.committed)throw'duplicate';
+    return path(level,'votes/'+selected).transaction(v=>(v||0)+1);
+  }).then(r=>{
+    if(!r.committed)throw'fail';
+    let token='SNT-'+(crypto.randomUUID?crypto.randomUUID().slice(0,8):Math.random().toString(36).slice(2,10)).toUpperCase();
+    $('receipt-level').textContent=level.toUpperCase();
+    $('receipt-nama').textContent=user.nama;$('receipt-nis').textContent=user.nis;
+    $('receipt-time').textContent=new Date().toLocaleString('id-ID');$('receipt-token').textContent='TOKEN: '+token;
+    $('qrcode').innerHTML='';
+    if(window.QRCode)new QRCode($('qrcode'),{text:token,width:128,height:128,colorDark:'#0b1024',colorLight:'#ffffff'});
+    logAction(level,`${user.nama} (NIS ${user.nis}) memberikan suara.`);
+    sessionStorage.removeItem('svote');
+    showPage('success-page');
+  }).catch(e=>toast(e==='closed'?'Voting sudah ditutup.':e==='duplicate'?'Suara sudah tercatat.':'Gagal mengirim suara.')).finally(()=>$('confirmBtn').disabled=false);
+}
+function printReceipt(){window.print();}
+function copyReceipt(){navigator.clipboard?.writeText($('receipt-token').textContent).then(()=>toast('Token disalin.'));}
+
+/* ---------- banner / countdown / connectivity ---------- */
+function updateBanner(c){
+  let b=$('banner');currentConfig=c||{};
+  let lvl=level||adminLevel;
+  if(!c||!c.isOpen){
+    if(c&&c.startTime){
+      let diff=c.startTime-Date.now();
+      if(diff<=0){path(lvl,'config').update({isOpen:true,startTime:null,endTime:c.pendingDuration?Date.now()+c.pendingDuration*60000:null,pendingDuration:null});return;}
+      let s=Math.floor(diff/1000);
+      b.className='banner';
+      b.textContent=`🕐 VOTING ${lvl.toUpperCase()} AKAN DIBUKA · ${new Date(c.startTime).toLocaleString('id-ID')} (${Math.floor(s/3600)}j ${Math.floor(s%3600/60)}m lagi)`;
+      return;
+    }
+    b.className='banner';b.textContent='🔒 VOTING SEDANG DITUTUP';return;
+  }
+  if(c.endTime&&c.endTime-Date.now()<=0){path(lvl,'config').set({isOpen:false,endTime:null});return;}
+  let left=c.endTime?Math.max(0,Math.floor((c.endTime-Date.now())/1000)):null;
+  if(left!==null&&left<=300&&!warned5min&&!isAdmin){warned5min=true;toast('⏰ Waktu voting hampir habis, kurang dari 5 menit lagi!');}
+  b.className='banner open'+(left!==null&&left<=300?' warn':'');
+  b.textContent=left!==null?`⏱️ VOTING ${lvl.toUpperCase()} DIBUKA · ${Math.floor(left/3600)}j ${Math.floor(left%3600/60)}m ${left%60}d`:'🔓 VOTING DIBUKA · Tanpa batas waktu';
+}
+db.ref('.info/connected').on('value',s=>{$('network').classList.toggle('offline',!s.val()\vert{}\vert{}!navigator.onLine);$('networkText').textContent=s.val()&&navigator.onLine?'Terhubung ke server SNT':'Koneksi terputus — jangan kirim suara';});
+setInterval(()=>{let lvl=level||(isAdmin?adminLevel:null);if(lvl)path(lvl,'config').once('value').then(s=>updateBanner(s.val()));},1000);
+
+/* ---------- admin: level switch & realtime data ---------- */
+function setAdminLevel(x){
+  adminLevel=x;$('admin-level').value=x;$('admin-level-label').textContent=x.toUpperCase();$('stats-level-label').textContent=x.toUpperCase();
+  sessionStorage.setItem('svote',JSON.stringify({isAdmin:true,adminLevel,adminName:currentAdminName}));
+  path(x,'config').once('value').then(s=>{let c=s.val()||{};$('pinCode').value=c.pin||'';});
+  attachAdminListener(x);renderAdminCandidates();renderAdminFaq();renderAdminAccounts();filterStudents();renderLogs();
+  $('master-nis').textContent=MASTER_ADMIN.nis;
+}
+let adminVotesRef=null;
+function attachAdminListener(lvl){
+  if(adminVotesRef)adminVotesRef.off();
+  adminVotesRef=path(lvl,'');
+  adminVotesRef.on('value',s=>{
+    let d=s.val()||{};votesCache=d.votes||{};votersCache=d.voters||{};
+    renderStats();renderChart();renderTrendChart();filterStudents();
+  });
+}
+function renderTrendChart(){
+  let hours=new Array(24).fill(0);
+  Object.values(votersCache).forEach(v=>{if(v&&v.at)hours[new Date(v.at).getHours()]++;});
+  let labels=hours.map((_,h)=>h.toString().padStart(2,'0')+':00');
+  if(trendChart)trendChart.destroy();
+  trendChart=new Chart($('trendChart'),{type:'bar',data:{labels,datasets:[{label:'Jumlah suara',data:hours,backgroundColor:'#c8962c'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
+}
+function renderStats(){
+  let students=studentsCache[adminLevel]||{};
+  let total=Object.keys(students).length,count=Object.keys(votersCache).length;
+  let p=total?count/total*100:0;
+  $('stat-total').textContent=total;$('stat-voted').textContent=count;$('stat-unvoted').textContent=Math.max(0,total-count);
+  $('turnout').textContent=p.toFixed(1)+'\% ('+count+'/'+total+')';$('turnout-bar').style.width=p+'%';
+  let cands=candidatesCache[adminLevel]||{};let ids=Object.keys(cands);
+  let sum=ids.reduce((a,id)=>a+(+votesCache[id]||0),0);
+  if(!sum){$('admin-winner').textContent='📊 Belum ada suara yang masuk';}
+  else{
+    let best=ids.reduce((a,b)=>(+votesCache[a]||0)>=(+votesCache[b]||0)?a:b);
+    let bestVotes=+votesCache[best]||0;let tie=ids.filter(id=>(+votesCache[id]||0)===bestVotes).length>1;
+    $('admin-winner').textContent=tie?'⚖️ Sementara imbang':`🏆 ${safe(cands[best].label)} memimpin (${(bestVotes/sum*100).toFixed(1)}%)`;
+  }
+  let byKelas={};Object.entries(students).forEach(([nis,st])=>{let k=st.kelas||'Tanpa kelas';byKelas[k]=byKelas[k]||{total:0,voted:0};byKelas[k].total++;if(votersCache[nis])byKelas[k].voted++;});
+  $('kelas-bars').innerHTML=Object.keys(byKelas).sort().map(k=>{let d=byKelas[k];let pct=d.total?d.voted/d.total*100:0;
+    return `<div class="kelas-row"><span>${safe(k)}</span><div class="progress"><i style="width:${pct}%"></i></div><span>${d.voted}/${d.total}</span></div>`;
+  }).join('')||'<p class="sub" style="text-align:left;margin:0">Belum ada data siswa.</p>';
+}
+function renderChart(){
+  let cands=candidatesCache[adminLevel]||{};let ids=Object.keys(cands);
+  let labels=ids.map(id=>{let sum=ids.reduce((a,i)=>a+(+votesCache[i]||0),0);let v=+votesCache[id]||0;return `${cands[id].label} (${sum?(v/sum*100).toFixed(1):'0.0'}%)`;});
+  let data=ids.map(id=>+votesCache[id]||0);
+  if(chart)chart.destroy();
+  if(!ids.length)return;
+  chart=new Chart($('chart'),{type:$('chartType').value,data:{labels,datasets:[{data,backgroundColor:['#0b1024','#c8962c','#2f8f5b','#8a3226','#5b4b8a']}]},options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:$('chartType').value==='bar'?{y:{beginAtZero:true,ticks:{stepSize:1}}}:{}}});
+}
+
+/* ---------- admin: siswa CRUD ---------- */
+function filterStudents(){
+  let q=($('search')?.value||'').toLowerCase();
+  let kelasFilter=$('filterKelas')?.value||'';
+  let list=studentsCache[adminLevel]||{};
+  let kelasSet=[...new Set(Object.values(list).map(s=>s.kelas).filter(Boolean))].sort();
+  let sel=$('filterKelas');
+  if(sel&&sel.dataset.count!=kelasSet.length){
+    sel.innerHTML='<option value="">Semua kelas</option>'+kelasSet.map(k=>`<option value="${safe(k)}">${safe(k)}</option>`).join('');
+    sel.value=kelasFilter;sel.dataset.count=kelasSet.length;
+  }
+  let otherLevel=adminLevel==='smp'?'sma':'smp';
+  let rows=Object.entries(list).filter(([nis,s])=>(nis.includes(q)||(s.nama||'').toLowerCase().includes(q))&&(!kelasFilter||s.kelas===kelasFilter));
+  $('student-list').innerHTML=rows.length?rows.map(([nis,s])=>`<div class="student"><span><b>${safe(s.nama)}</b><br><small>NIS ${safe(nis)} · ${safe(s.kelas||'-')}</small></span>
+    <span class="student-actions"><span class="badge ${votersCache[nis]?'yes':'no'}">${votersCache[nis]?'Sudah memilih':'Belum memilih'}</span>
+    <button class="btn ghost small-btn" onclick="openStudentModal('${nis}')">Edit</button>
+    <button class="btn ghost small-btn" onclick="resetStudentPassword('${nis}')">Reset pass</button>
+    <button class="btn ghost small-btn" onclick="copyStudentToOtherLevel('${nis}')" title="Salin ke OSIS ${otherLevel.toUpperCase()}">↔ ${otherLevel.toUpperCase()}</button>
+    <button class="btn red small-btn" onclick="deleteStudent('${nis}')">Hapus</button></span></div>`).join('')
+    :'<div class="student">Data tidak ditemukan.</div>';
+}
+function copyStudentToOtherLevel(nis){
+  let s=(studentsCache[adminLevel]||{})[nis];if(!s)return;
+  let target=adminLevel==='smp'?'sma':'smp';
+  path(target,'students/'+nis).once('value').then(snap=>{
+    if(snap.exists()&&!confirm('NIS '+nis+' sudah ada di jenjang '+target.toUpperCase()+'. Timpa datanya?'))return;
+    path(target,'students/'+nis).set({nama:s.nama,password:s.password,kelas:''}).then(()=>{
+      logAction(adminLevel,`Siswa ${s.nama} (NIS ${nis}) disalin ke jenjang ${target.toUpperCase()}.`);renderLogs();
+      toast('Siswa disalin ke OSIS '+target.toUpperCase()+'. Jangan lupa isi kelasnya.');
+    });
+  });
+}
+function resetStudentPassword(nis){
+  let newPass=Math.random().toString().slice(2,8);
+  path(adminLevel,'students/'+nis+'/password').set(newPass).then(()=>{
+    logAction(adminLevel,`Password siswa NIS ${nis} direset oleh panitia.`);renderLogs();
+    alert('Password baru untuk NIS '+nis+': '+newPass+'\nSampaikan ke siswa secara langsung.');
+  });
+}
+function deleteStudent(nis){
+  if(!confirm('Hapus siswa dengan NIS '+nis+'?'))return;
+  let data=(studentsCache[adminLevel]||{})[nis];let lvl=adminLevel;
+  path(lvl,'students/'+nis).remove().then(()=>{
+    logAction(lvl,`Siswa NIS ${nis} dihapus oleh ${currentAdminName}.`);renderLogs();
+    toast('Siswa dihapus.','Urungkan',()=>{path(lvl,'students/'+nis).set(data).then(()=>{logAction(lvl,`Penghapusan siswa NIS ${nis} diurungkan.`);renderLogs();});});
+  });
+}
+function openStudentModal(nis){
+  editingStudentNis=nis||null;
+  let s=nis?(studentsCache[adminLevel]||{})[nis]:{};s=s||{};
+  $('modal-root').innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
+    <h3>${nis?'Edit siswa':'Tambah siswa'}</h3>
+    <div class="field"><label>NIS</label><input id="m-nis" value="${safe(nis||'')}" ${nis?'disabled':''} placeholder="Contoh: 1003"></div>
+    <div class="field"><label>Nama lengkap</label><input id="m-nama" value="${safe(s.nama||'')}"></div>
+    <div class="field"><label>Kelas</label><input id="m-kelas" value="${safe(s.kelas||'')}" placeholder="Contoh: VII A"></div>
+    <div class="field"><label>Password</label><input id="m-pass" value="${safe(s.password||'')}" placeholder="Password login"></div>
+    <div class="actions"><button class="btn primary" onclick="saveStudent()">Simpan</button><button class="btn ghost" onclick="closeModal()">Batal</button></div>
+  </div></div>`;
+}
+function saveStudent(){
+  let nis=$('m-nis').value.trim(),nama=$('m-nama').value.trim(),kelas=$('m-kelas').value.trim(),pass=$('m-pass').value.trim();
+  if(!nis||!nama||!pass)return toast('NIS, nama, dan password wajib diisi.');
+  path(adminLevel,'students/'+nis).set({nama,kelas,password:pass}).then(()=>{
+    logAction(adminLevel,`Siswa ${nama} (NIS ${nis}) ${editingStudentNis?'diperbarui':'ditambahkan'}.`);renderLogs();
+    closeModal();toast('Data siswa disimpan.');
+  });
+}
+function importCSV(ev){
+  let file=ev.target.files[0];if(!file)return;
+  let reader=new FileReader();
+  reader.onload=()=>{
+    let lines=reader.result.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+    let updates={};let count=0;
+    lines.forEach(line=>{
+      let [nis,nama,pass,kelas]=line.split(',').map(x=>(x||'').trim());
+      if(!nis||nis.toLowerCase()==='nis'||!nama)return;
+      updates[nis]={nama,password:pass||'123',kelas:kelas||''};count++;
+    });
+    if(!count)return toast('Tidak ada baris valid ditemukan di file CSV.');
+    path(adminLevel,'students').update(updates).then(()=>{logAction(adminLevel,`Impor CSV: ${count} siswa ditambahkan/diperbarui.`);renderLogs();toast(count+' siswa berhasil diimpor.');});
+  };
+  reader.readAsText(file);ev.target.value='';
+}
+
+/* ---------- admin: kandidat CRUD ---------- */
+function renderAdminCandidates(){
+  let list=candidatesCache[adminLevel]||{};
+  $('admin-candidates').innerHTML=Object.keys(list).map(id=>{let c=list[id];
+    return `<div class="cand-admin"><div style="display:flex;justify-content:space-between;align-items:center"><b>No. ${safe(id)} — ${safe(c.label)}</b>
+    <span class="student-actions"><button class="btn ghost small-btn" onclick="openCandidateModal('${id}')">Edit</button><button class="btn red small-btn" onclick="deleteCandidate('${id}')">Hapus</button></span></div>
+    <p class="sub" style="text-align:left;margin:6px 0 0">${safe(c.ketuaNama)} (${safe(c.ketuaKelas)}) &amp; ${safe(c.wakilNama)} (${safe(c.wakilKelas)})</p></div>`;
+  }).join('')||'<p class="sub" style="text-align:left">Belum ada pasangan calon.</p>';
+}
+function deleteCandidate(id){
+  if(!confirm('Hapus pasangan calon ini? Suara yang sudah masuk untuk paslon ini juga akan hilang dari perhitungan.'))return;
+  let data=(candidatesCache[adminLevel]||{})[id];let votes=votesCache[id]||0;let lvl=adminLevel;
+  path(lvl,'candidates/'+id).remove();path(lvl,'votes/'+id).remove();
+  logAction(lvl,`Pasangan calon "${data?data.label:id}" dihapus oleh ${currentAdminName}.`);renderLogs();
+  toast('Paslon dihapus.','Urungkan',()=>{
+    path(lvl,'candidates/'+id).set(data);path(lvl,'votes/'+id).set(votes);
+    logAction(lvl,`Penghapusan paslon "${data?data.label:id}" diurungkan.`);renderLogs();
+  });
+}
+function openCandidateModal(id){
+  editingCandidateId=id||null;
+  let c=id?(candidatesCache[adminLevel]||{})[id]:{};c=c||{};
+  let nextId=id||(Math.max(0,...Object.keys(candidatesCache[adminLevel]||{}).map(Number))+1);
+  $('modal-root').innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
+    <h3>${id?'Edit paslon':'Tambah paslon'}</h3>
+    <input type="hidden" id="m-cid" value="${nextId}">
+    <div class="field"><label>Nama paslon</label><input id="m-label" value="${safe(c.label||'')}" placeholder="Contoh: Paslon 3"></div>
+    <h4 style="margin-top:0">Ketua</h4>
+    <div class="grid2">
+      <div class="field"><label>Nama Ketua</label><input id="m-ketuaNama" value="${safe(c.ketuaNama||'')}"></div>
+      <div class="field"><label>Kelas Ketua</label><input id="m-ketuaKelas" value="${safe(c.ketuaKelas||'')}" placeholder="Contoh: VIII A"></div>
+    </div>
+    <div class="field"><label>Foto Ketua (URL)</label><input id="m-ketuaFoto" value="${safe(c.ketuaFoto||'')}"></div>
+    <h4>Wakil</h4>
+    <div class="grid2">
+      <div class="field"><label>Nama Wakil</label><input id="m-wakilNama" value="${safe(c.wakilNama||'')}"></div>
+      <div class="field"><label>Kelas Wakil</label><input id="m-wakilKelas" value="${safe(c.wakilKelas||'')}" placeholder="Contoh: IX C"></div>
+    </div>
+    <div class="field"><label>Foto Wakil (URL)</label><input id="m-wakilFoto" value="${safe(c.wakilFoto||'')}"></div>
+    <div class="field"><label>Visi &amp; misi singkat</label><textarea id="m-visi" rows="3" oninput="updateCandPreview()">${safe(c.visi||'')}</textarea></div>
+    <div class="cand-preview-wrap"><h4>Pratinjau kartu</h4><div id="cand-preview"></div></div>
+    <div class="actions"><button class="btn primary" onclick="saveCandidate()">Simpan</button><button class="btn ghost" onclick="closeModal()">Batal</button></div>
+  </div></div>`;
+  ['m-label','m-ketuaNama','m-ketuaKelas','m-ketuaFoto','m-wakilNama','m-wakilKelas','m-wakilFoto'].forEach(fid=>$(fid).oninput=updateCandPreview);
+  updateCandPreview();
+}
+function updateCandPreview(){
+  let get=fid=>safe($(fid).value);$('cand-preview').innerHTML=`<article class="candidate" style="max-width:280px;margin:0 auto"><span class="cand-number">${$('m-cid').value}</span>
+    <h3>${get('m-label')||'Nama paslon'}</h3><div class="people">
+    <div class="person"><img src="${safe($('m-ketuaFoto').value||'https://placehold.co/80')}" alt=""><b>${get('m-ketuaNama')||'Nama ketua'}</b><small>Ketua · ${get('m-ketuaKelas')}</small></div>
+    <div class="person"><img src="${safe($('m-wakilFoto').value||'https://placehold.co/80')}" alt=""><b>${get('m-wakilNama')||'Nama wakil'}</b><small>Wakil · ${get('m-wakilKelas')}</small></div>
+    </div></article>`;
+}
+function saveCandidate(){
+  let id=$('m-cid').value;
+  let label=$('m-label').value.trim();
+  let ketuaNama=$('m-ketuaNama').value.trim(),ketuaFoto=$('m-ketuaFoto').value.trim(),ketuaKelas=$('m-ketuaKelas').value.trim();
+  let wakilNama=$('m-wakilNama').value.trim(),wakilFoto=$('m-wakilFoto').value.trim(),wakilKelas=$('m-wakilKelas').value.trim();
+  let visi=$('m-visi').value.trim();
+  if(!label||!ketuaNama||!wakilNama)return toast('Nama paslon, ketua, dan wakil wajib diisi.');
+  path(adminLevel,'candidates/'+id).set({label,ketuaNama,ketuaFoto,ketuaKelas,wakilNama,wakilFoto,wakilKelas,visi}).then(()=>{
+    logAction(adminLevel,`Paslon "${label}" ${editingCandidateId?'diperbarui':'ditambahkan'}.`);renderLogs();closeModal();toast('Data paslon disimpan.');
+  });
+}
+function closeModal(){$('modal-root').innerHTML='';editingStudentNis=null;editingCandidateId=null;editingFaqId=null;editingAdminId=null;}
+
+/* ---------- admin: sesi & data ---------- */
+function openVoting(){
+  let n=+$('duration').value;let pin=$('pinCode').value.trim();
+  path(adminLevel,'config').set({isOpen:true,endTime:n>0?Date.now()+n*60000:null,pin:pin||null,startTime:null}).then(()=>{
+    logAction(adminLevel,`Voting dibuka oleh ${currentAdminName}${n>0?` selama ${n} menit`:' tanpa batas waktu'}${pin?' dengan kode konfirmasi':''}.`);renderLogs();toast('Sesi '+adminLevel.toUpperCase()+' dibuka.');
+  });
+}
+function scheduleVoting(){
+  let raw=$('scheduleTime').value;if(!raw)return toast('Pilih tanggal dan jam terlebih dahulu.');
+  let t=new Date(raw).getTime();if(t<=Date.now())return toast('Waktu jadwal harus di masa depan.');
+  let n=+$('duration').value;let pin=$('pinCode').value.trim();
+  path(adminLevel,'config').set({isOpen:false,startTime:t,pendingDuration:n>0?n:null,pin:pin||null}).then(()=>{
+    logAction(adminLevel,`Voting dijadwalkan otomatis dibuka oleh ${currentAdminName} pada ${new Date(t).toLocaleString('id-ID')}.`);renderLogs();toast('Voting dijadwalkan.');
+  });
+}
+function closeVoting(){
+  if(!confirm('Tutup voting jenjang ini?'))return;
+  path(adminLevel,'config').set({isOpen:false,endTime:null,startTime:null}).then(()=>{logAction(adminLevel,`Voting ditutup oleh ${currentAdminName}.`);renderLogs();toast('Voting ditutup.');});
+}
+function resetData(){
+  if(!confirm('Reset seluruh data suara jenjang '+adminLevel.toUpperCase()+'? Data siswa dan paslon tidak akan dihapus.'))return;
+  let cands=candidatesCache[adminLevel]||{};let zeros={};Object.keys(cands).forEach(id=>zeros[id]=0);
+  path(adminLevel,'').update({votes:zeros,voters:null}).then(()=>{logAction(adminLevel,'Data suara direset oleh panitia.');renderLogs();toast('Data berhasil direset.');});
+}
+function exportCSV(){
+  let students=studentsCache[adminLevel]||{};
+  let rows=[['Nama','NIS','Kelas','Status'],...Object.entries(students).map(([nis,s])=>[s.nama,nis,s.kelas||'',votersCache[nis]?'Sudah memilih':'Belum memilih'])];
+  let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.map(x=>x.join(',')).join('\n')],{type:'text/csv'}));a.download='status-'+adminLevel+'.csv';a.click();
+}
+
+/* ---------- admin: FAQ CRUD ---------- */
+function renderAdminFaq(){
+  let ids=Object.keys(faqCache);
+  $('admin-faq').innerHTML=ids.length?ids.map(id=>{let f=faqCache[id];
+    return `<div class="cand-admin"><div style="display:flex;justify-content:space-between;align-items:center"><b>${safe(f.q)}</b>
+    <span class="student-actions"><button class="btn ghost small-btn" onclick="openFaqModal('${id}')">Edit</button><button class="btn red small-btn" onclick="deleteFaq('${id}')">Hapus</button></span></div>
+    <p class="sub" style="text-align:left;margin:6px 0 0">${safe(f.a)}</p></div>`;
+  }).join(''):'<p class="sub" style="text-align:left">Belum ada FAQ.</p>';
+}
+function openFaqModal(id){
+  editingFaqId=id||null;let f=id?faqCache[id]:{};f=f||{};
+  $('modal-root').innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
+    <h3>${id?'Edit FAQ':'Tambah FAQ'}</h3>
+    <div class="field"><label>Pertanyaan</label><input id="m-faq-q" value="${safe(f.q||'')}" placeholder="Contoh: Kapan voting dibuka?"></div>
+    <div class="field"><label>Jawaban</label><textarea id="m-faq-a" rows="3">${safe(f.a||'')}</textarea></div>
+    <div class="actions"><button class="btn primary" onclick="saveFaq('${id||''}')">Simpan</button><button class="btn ghost" onclick="closeModal()">Batal</button></div>
+  </div></div>`;
+}
+function saveFaq(id){
+  let q=$('m-faq-q').value.trim(),a=$('m-faq-a').value.trim();
+  if(!q||!a)return toast('Pertanyaan dan jawaban wajib diisi.');
+  let ref=id?db.ref('faq/'+id):db.ref('faq').push();
+  ref.set({q,a}).then(()=>{logAction(adminLevel,`FAQ "${q}" ${id?'diperbarui':'ditambahkan'} oleh ${currentAdminName}.`);renderLogs();closeModal();toast('FAQ disimpan.');});
+}
+function deleteFaq(id){
+  if(!confirm('Hapus FAQ ini?'))return;
+  let data=faqCache[id];
+  db.ref('faq/'+id).remove().then(()=>{
+    toast('FAQ dihapus.','Urungkan',()=>db.ref('faq/'+id).set(data));
+  });
+}
+
+/* ---------- admin: akun panitia ---------- */
+function renderAdminAccounts(){
+  $('master-nis').textContent=MASTER_ADMIN.nis;
+  let ids=Object.keys(adminsCache);
+  $('admin-accounts').innerHTML=(`<div class="admin-account"><span><b>${safe(MASTER_ADMIN.nama)}</b><br><small>NIS ${MASTER_ADMIN.nis} · Akun utama</small></span></div>`)+
+    (ids.length?ids.map(id=>{let a=adminsCache[id];return `<div class="admin-account"><span><b>${safe(a.nama)}</b><br><small>NIS ${safe(a.nis)}</small></span><button class="btn red small-btn" onclick="deleteAdminAccount('${id}')">Hapus</button></div>`;}).join(''):'');
+}
+function openAdminAccountModal(){
+  $('modal-root').innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal">
+    <h3>Tambah akun panitia</h3>
+    <div class="field"><label>Nama panitia</label><input id="m-admin-nama" placeholder="Contoh: Bu Rina (Guru BK)"></div>
+    <div class="field"><label>NIS/username login</label><input id="m-admin-nis" placeholder="Contoh: panitia-rina"></div>
+    <div class="field"><label>Password</label><input id="m-admin-pass" placeholder="Password login"></div>
+    <div class="actions"><button class="btn primary" onclick="saveAdminAccount()">Simpan</button><button class="btn ghost" onclick="closeModal()">Batal</button></div>
+  </div></div>`;
+}
+function saveAdminAccount(){
+  let nama=$('m-admin-nama').value.trim(),nis=$('m-admin-nis').value.trim(),pass=$('m-admin-pass').value.trim();
+  if(!nama||!nis||!pass)return toast('Semua kolom wajib diisi.');
+  if(nis===MASTER_ADMIN.nis)return toast('NIS ini sudah dipakai akun utama, gunakan NIS lain.');
+  db.ref('admins').push({nama,nis,pass}).then(()=>{logAction(adminLevel,`Akun panitia "${nama}" ditambahkan oleh ${currentAdminName}.`);renderLogs();closeModal();toast('Akun panitia ditambahkan.');});
+}
+function deleteAdminAccount(id){
+  if(!confirm('Hapus akun panitia ini?'))return;
+  db.ref('admins/'+id).remove().then(()=>toast('Akun panitia dihapus.'));
+}
+
+/* ---------- admin: berita acara PDF ---------- */
+function exportBeritaAcara(){
+  let cands=candidatesCache[adminLevel]||{};let ids=Object.keys(cands);
+  let sum=ids.reduce((a,id)=>a+(+votesCache[id]||0),0);
+  let total=Object.keys(studentsCache[adminLevel]||{}).length,voted=Object.keys(votersCache).length;
+  let { jsPDF }=window.jspdf;let doc=new jsPDF();
+  doc.setFont('helvetica','bold');doc.setFontSize(14);doc.text('BERITA ACARA HASIL PEMILIHAN OSIS',105,20,{align:'center'});
+  doc.setFontSize(11);doc.text('Sekolah Nasional Terintegrasi',105,27,{align:'center'});
+  doc.setFont('helvetica','normal');doc.setFontSize(10);
+  doc.text('Jenjang: OSIS '+adminLevel.toUpperCase(),15,42);
+  doc.text('Tanggal dokumen: '+new Date().toLocaleString('id-ID'),15,49);
+  doc.text('Total siswa terdaftar: '+total,15,56);
+  doc.text('Total siswa yang memilih: '+voted+' ('+(total?(voted/total*100).toFixed(1):'0')+'%)',15,63);
+  let y=75;doc.setFont('helvetica','bold');doc.text('Hasil perolehan suara:',15,y);doc.setFont('helvetica','normal');y+=8;
+  ids.forEach(id=>{let v=+votesCache[id]||0;let pct=sum?(v/sum*100).toFixed(1):'0.0';
+    doc.text(`No. ${id} - ${cands[id].label}: ${v} suara (${pct}%)`,18,y);y+=7;});
+  y+=10;doc.text('Dengan ini menyatakan bahwa hasil pemilihan di atas adalah sah dan telah',15,y);y+=6;doc.text('diperiksa oleh panitia pemilihan OSIS.',15,y);
+  y+=20;doc.text('Panitia Pemilihan,',15,y);y+=25;doc.text(currentAdminName,15,y);doc.line(15,y-3,70,y-3);
+  doc.save('berita-acara-osis-'+adminLevel+'.pdf');
+  logAction(adminLevel,`Berita acara diunduh oleh ${currentAdminName}.`);renderLogs();
+}
+
+/* ---------- theme & init ---------- */
+$('themeBtn').onclick=()=>{let d=document.documentElement.dataset.theme!=='dark';document.documentElement.dataset.theme=d?'dark':'light';localStorage.setItem('theme',d?'dark':'light');};
+if(localStorage.getItem('theme')==='dark')document.documentElement.dataset.theme='dark';
+restoreSession();
+</script>
+</body>
+</html>
