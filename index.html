@@ -500,34 +500,108 @@ function copyReceipt(){navigator.clipboard?.writeText($('receipt-token').textCon
 function updateBanner(c){
   let b=$('banner');currentConfig=c||{};
   let lvl=level||adminLevel;
+
   if(!c||!c.isOpen){
     if(c&&c.startTime){
       let diff=c.startTime-Date.now();
-      if(diff<=0){path(lvl,'config').update({isOpen:true,startTime:null,endTime:c.pendingDuration?Date.now()+c.pendingDuration*60000:null,pendingDuration:null});return;}
+
+      if(diff<=0){
+        path(lvl,'config').update({
+          isOpen:true,
+          startTime:null,
+          endTime:c.pendingDuration
+            ?Date.now()+c.pendingDuration*60000
+            :null,
+          pendingDuration:null
+        });
+        return;
+      }
+
       let s=Math.floor(diff/1000);
       b.className='banner';
       b.textContent=`🕐 VOTING ${lvl.toUpperCase()} AKAN DIBUKA · ${new Date(c.startTime).toLocaleString('id-ID')} (${Math.floor(s/3600)}j ${Math.floor(s%3600/60)}m lagi)`;
       return;
     }
-    b.className='banner';b.textContent='🔒 VOTING SEDANG DITUTUP';return;
+
+    b.className='banner';
+    b.textContent='🔒 VOTING SEDANG DITUTUP';
+    return;
   }
-  if(c.endTime&&c.endTime-Date.now()<=0){path(lvl,'config').set({isOpen:false,endTime:null});return;}
-  let left=c.endTime?Math.max(0,Math.floor((c.endTime-Date.now())/1000)):null;
-  if(left!==null&&left<=300&&!warned5min&&!isAdmin){warned5min=true;toast('⏰ Waktu voting hampir habis, kurang dari 5 menit lagi!');}
+
+  if(c.endTime&&c.endTime-Date.now()<=0){
+    path(lvl,'config').set({
+      isOpen:false,
+      endTime:null
+    });
+    return;
+  }
+
+  let left=c.endTime
+    ?Math.max(0,Math.floor((c.endTime-Date.now())/1000))
+    :null;
+
+  if(left!==null&&left<=300&&!warned5min&&!isAdmin){
+    warned5min=true;
+    toast('⏰ Waktu voting hampir habis, kurang dari 5 menit lagi!');
+  }
+
   b.className='banner open'+(left!==null&&left<=300?' warn':'');
-  b.textContent=left!==null?`⏱️ VOTING ${lvl.toUpperCase()} DIBUKA · ${Math.floor(left/3600)}j ${Math.floor(left%3600/60)}m ${left%60}d`:'🔓 VOTING DIBUKA · Tanpa batas waktu';
+  b.textContent=left!==null
+    ?`⏱️ VOTING ${lvl.toUpperCase()} DIBUKA · ${Math.floor(left/3600)}j ${Math.floor(left%3600/60)}m ${left%60}d`
+    :'🔓 VOTING DIBUKA · Tanpa batas waktu';
 }
-db.ref('.info/connected').on('value',s=>{$('network').classList.toggle('offline',!s.val()\vert{}\vert{}!navigator.onLine);$('networkText').textContent=s.val()&&navigator.onLine?'Terhubung ke server SNT':'Koneksi terputus — jangan kirim suara';});
-setInterval(()=>{let lvl=level||(isAdmin?adminLevel:null);if(lvl)path(lvl,'config').once('value').then(s=>updateBanner(s.val()));},1000);
+
+/* ---------- STATUS KONEKSI FIREBASE ---------- */
+db.ref('.info/connected').on('value', s => {
+  const connected = s.val() === true && navigator.onLine === true;
+
+  $('network').classList.toggle('offline', !connected);
+
+  $('networkText').textContent = connected
+    ? 'Terhubung ke server SNT'
+    : 'Koneksi terputus — jangan kirim suara';
+});
+
+setInterval(() => {
+  let lvl=level||(isAdmin?adminLevel:null);
+
+  if(lvl){
+    path(lvl,'config')
+      .once('value')
+      .then(s=>updateBanner(s.val()));
+  }
+},1000);
 
 /* ---------- admin: level switch & realtime data ---------- */
 function setAdminLevel(x){
-  adminLevel=x;$('admin-level').value=x;$('admin-level-label').textContent=x.toUpperCase();$('stats-level-label').textContent=x.toUpperCase();
-  sessionStorage.setItem('svote',JSON.stringify({isAdmin:true,adminLevel,adminName:currentAdminName}));
-  path(x,'config').once('value').then(s=>{let c=s.val()||{};$('pinCode').value=c.pin||'';});
-  attachAdminListener(x);renderAdminCandidates();renderAdminFaq();renderAdminAccounts();filterStudents();renderLogs();
+  adminLevel=x;
+  $('admin-level').value=x;
+  $('admin-level-label').textContent=x.toUpperCase();$('stats-level-label').textContent=x.toUpperCase();
+
+  sessionStorage.setItem(
+    'svote',
+    JSON.stringify({
+      isAdmin:true,
+      adminLevel,
+      adminName:currentAdminName
+    })
+  );
+
+  path(x,'config').once('value').then(s=>{
+    let c=s.val()||{};
+    $('pinCode').value=c.pin||'';
+  });
+
+  attachAdminListener(x);
+  renderAdminCandidates();
+  renderAdminFaq();
+  renderAdminAccounts();
+  filterStudents();
+  renderLogs();
+
   $('master-nis').textContent=MASTER_ADMIN.nis;
 }
+
 let adminVotesRef=null;
 function attachAdminListener(lvl){
   if(adminVotesRef)adminVotesRef.off();
