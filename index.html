@@ -77,6 +77,21 @@ main{max-width:1080px;margin:auto;padding:36px 16px 70px}
 .level-icon{width:46px;height:46px;margin:0 auto 8px;color:var(--gold-deep)}
 .level h3{margin:6px 0 3px;font-family:var(--serif)}
 .level p{margin:0 0 15px;color:var(--muted);font-size:12px}
+.level.locked{opacity:.5}
+.level.locked:hover{transform:none;border-color:var(--line);box-shadow:none}
+.stage-note{text-align:center;color:var(--gold-deep);font-size:12px;font-weight:700;margin:-14px 0 18px}
+[data-theme=dark] .stage-note{color:#e8c878}
+
+/* live vote feed */
+.feed-list{max-height:230px;overflow:auto;display:flex;flex-direction:column;gap:8px}
+.feed-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-size:12.5px;animation:feedIn .45s ease}
+@keyframes feedIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+
+/* results reveal */
+.progress i{transition:width 7s cubic-bezier(.16,1,.3,1)}
+.reveal-card{text-align:center}
+.winner.reveal{animation:winnerPop .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes winnerPop{0%{opacity:0;transform:scale(.85)}100%{opacity:1;transform:scale(1)}}
 
 .welcome{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;padding:16px 19px;border-radius:15px;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#f6f4ea}
 .welcome small{display:block;color:#c7cadf}
@@ -181,19 +196,20 @@ main{max-width:1080px;margin:auto;padding:36px 16px 70px}
   <div class="eyebrow">PORTAL PEMILIHAN OSIS</div>
   <h2 class="title">Pilih jenjangmu</h2>
   <p class="sub">Setiap jenjang memiliki calon, sesi, dan hasil voting yang terpisah.</p>
+  <p class="stage-note" id="stage-note">Memeriksa tahap pemilihan…</p>
   <div class="level-grid">
     <article class="level">
-      <svg class="level-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19V9l8-4 8 4v10"/><path d="M9 21v-6h6v6"/><path d="M4 9l8 4 8-4"/></svg>
-      <h3>OSIS SMP</h3><p>Pemilihan Ketua &amp; Wakil OSIS SMP</p>
-      <button class="btn primary full" onclick="chooseLevel('smp')">Masuk SMP →</button>
-    </article>
-    <article class="level">
       <svg class="level-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 10L12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>
-      <h3>OSIS SMA</h3><p>Pemilihan Ketua &amp; Wakil OSIS SMA</p>
+      <h3>OSIS SMA</h3><p>Pemilihan Ketua &amp; Wakil OSIS SMA · Tahap 1</p>
       <button class="btn gold full" onclick="chooseLevel('sma')">Masuk SMA →</button>
     </article>
+    <article class="level" id="level-smp">
+      <svg class="level-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19V9l8-4 8 4v10"/><path d="M9 21v-6h6v6"/><path d="M4 9l8 4 8-4"/></svg>
+      <h3>OSIS SMP</h3><p id="level-smp-desc">Pemilihan Ketua &amp; Wakil OSIS SMP · Tahap 2</p>
+      <button class="btn primary full" id="btn-smp" onclick="chooseLevel('smp')">Masuk SMP →</button>
+    </article>
   </div>
-  <div class="note">Data suara SMP dan SMA disimpan pada ruang tersendiri.</div>
+  <div class="note">Voting dilakukan bertahap: SMA terlebih dahulu, kemudian SMP. Data suara SMP dan SMA disimpan pada ruang tersendiri.</div>
   <div style="text-align:center;margin-top:14px"><button class="link-btn" onclick="showPage('faq-page')">❓ FAQ Voting</button></div>
 </section>
 
@@ -257,6 +273,15 @@ main{max-width:1080px;margin:auto;padding:36px 16px 70px}
     <select id="admin-level" class="search" onchange="setAdminLevel(this.value)"><option value="smp">OSIS SMP</option><option value="sma">OSIS SMA</option></select>
   </div>
 
+  <div class="section"><h3>Tahapan pemilihan</h3>
+    <p class="sub" style="text-align:left;margin:0 0 12px">Voting berlangsung bertahap: SMA dahulu, baru kemudian SMP dibuka untuk siswa.</p>
+    <div class="row" style="border:0;padding:0"><span>Tahap aktif saat ini</span><strong id="stage-current-label">SMA</strong></div>
+    <div class="actions" style="margin-top:12px">
+      <button class="btn gold" id="advanceStageBtn" onclick="advanceStage()">Selesai SMA → Buka Tahap SMP</button>
+      <button class="btn ghost hidden" id="revertStageBtn" onclick="revertStage()">← Kembali ke Tahap SMA</button>
+    </div>
+  </div>
+
   <div class="section"><h3>Sesi <span id="admin-level-label">SMP</span></h3>
     <div class="field"><label>Kode konfirmasi (opsional — dibagikan wali kelas/guru BK ke siswa sebelum vote)</label><input id="pinCode" class="search" placeholder="Contoh: BK2026"></div>
     <div class="actions"><input id="duration" class="search" type="number" min="1" max="1440" placeholder="Durasi menit (kosongkan = tanpa batas)"><button class="btn green" onclick="openVoting()">Buka voting sekarang</button><button class="btn red" onclick="closeVoting()">Tutup voting</button></div>
@@ -264,27 +289,41 @@ main{max-width:1080px;margin:auto;padding:36px 16px 70px}
     <div class="schedule-row"><input id="scheduleTime" class="search" type="datetime-local"><button class="btn ghost" onclick="scheduleVoting()">Jadwalkan</button></div>
   </div>
 
-  <div class="section"><h3>Statistik <span id="stats-level-label">SMP</span></h3>
-    <div id="admin-winner" class="winner">Memuat hasil…</div>
-    <div class="stats">
-      <div class="stat"><b id="stat-total">0</b><small>TOTAL SISWA</small></div>
-      <div class="stat"><b id="stat-voted" style="color:var(--green)">0</b><small>SUDAH MEMILIH</small></div>
-      <div class="stat"><b id="stat-unvoted" style="color:var(--red)">0</b><small>BELUM MEMILIH</small></div>
+  <div class="section"><h3>Aktivitas voting langsung <span id="feed-level-label">SMP</span></h3>
+    <p class="sub" style="text-align:left;margin:0 0 12px">Menampilkan siswa yang baru saja mengirim suara. Pilihan dan hasil belum ditampilkan di sini.</p>
+    <div class="feed-list" id="feed-list"><p class="sub">Belum ada yang memilih.</p></div>
+  </div>
+
+  <div class="section reveal-card" id="reveal-card">
+    <h3>Hasil pemilihan <span id="reveal-level-label">SMP</span></h3>
+    <p class="sub" style="margin:0 0 16px">Hasil disembunyikan sampai panitia menekan tombol di bawah ini.</p>
+    <button class="btn gold full" onclick="revealResults()">🔍 Cek Hasil Sekarang</button>
+  </div>
+
+  <div id="results-wrap" class="hidden">
+    <div class="section"><h3>Statistik <span id="stats-level-label">SMP</span></h3>
+      <div id="admin-winner" class="winner">Memuat hasil…</div>
+      <div class="stats">
+        <div class="stat"><b id="stat-total">0</b><small>TOTAL SISWA</small></div>
+        <div class="stat"><b id="stat-voted" style="color:var(--green)">0</b><small>SUDAH MEMILIH</small></div>
+        <div class="stat"><b id="stat-unvoted" style="color:var(--red)">0</b><small>BELUM MEMILIH</small></div>
+      </div>
+      <p style="color:var(--muted);font-size:12px;display:flex;justify-content:space-between;margin-top:14px"><b>Partisipasi</b><b id="turnout">0%</b></p>
+      <div class="progress"><i id="turnout-bar"></i></div>
+      <h4>Partisipasi per kelas</h4>
+      <div class="kelas-bars" id="kelas-bars"></div>
     </div>
-    <p style="color:var(--muted);font-size:12px;display:flex;justify-content:space-between;margin-top:14px"><b>Partisipasi</b><b id="turnout">0%</b></p>
-    <div class="progress"><i id="turnout-bar"></i></div>
-    <h4>Partisipasi per kelas</h4>
-    <div class="kelas-bars" id="kelas-bars"></div>
-  </div>
 
-  <div class="section"><h3>Grafik hasil</h3>
-    <div style="display:flex;justify-content:flex-end;margin-bottom:8px"><select id="chartType" class="search" style="width:auto;padding:7px" onchange="renderChart()"><option value="doughnut">Donat</option><option value="bar">Batang</option></select></div>
-    <canvas id="chart"></canvas>
-  </div>
+    <div class="section"><h3>Grafik hasil</h3>
+      <canvas id="chart"></canvas>
+    </div>
 
-  <div class="section"><h3>Tren voting per jam</h3>
-    <p class="sub" style="text-align:left;margin:0 0 12px">Menunjukkan jam berapa saja siswa paling banyak memilih.</p>
-    <canvas id="trendChart"></canvas>
+    <div class="section"><h3>Tren voting per jam</h3>
+      <p class="sub" style="text-align:left;margin:0 0 12px">Menunjukkan jam berapa saja siswa paling banyak memilih.</p>
+      <canvas id="trendChart"></canvas>
+    </div>
+
+    <div style="text-align:center;margin:6px 0 18px"><button class="btn ghost" onclick="hideResults()">Sembunyikan hasil</button></div>
   </div>
 
   <div class="section">
@@ -343,14 +382,21 @@ let level=null,adminLevel='smp',isAdmin=false,user=null,selected=null,chart=null
 let studentsCache={smp:{},sma:{}},candidatesCache={smp:{},sma:{}},votersCache={},votesCache={};
 let warned5min=false,editingStudentNis=null,editingCandidateId=null,editingFaqId=null,editingAdminId=null;
 let adminsCache={},faqCache={},currentAdminName=MASTER_ADMIN.nama,currentConfig={},lastDeleted=null,scheduleChecked=false;
+let stageCache={current:'sma'},resultsRevealed=false,revealToken=0,suspenseTimer=null;
+const SUSPENSE_PHRASES=['🥁 Menghitung suara…','🔎 Memverifikasi data pemilih…','📋 Mencocokkan hasil per kelas…','🗳️ Menyortir surat suara digital…','🥁 Menghitung suara…'];
+function startSuspense(){
+  stopSuspense();let i=0;$('admin-winner').textContent=SUSPENSE_PHRASES[0];
+  suspenseTimer=setInterval(()=>{i=(i+1)%SUSPENSE_PHRASES.length;$('admin-winner').textContent=SUSPENSE_PHRASES[i];},800);
+}
+function stopSuspense(){if(suspenseTimer){clearInterval(suspenseTimer);suspenseTimer=null;}}
 
 const DEFAULT_STUDENTS={
   smp:{'1001':{nama:'Budi Santoso',password:'123',kelas:'VII A'},'1002':{nama:'Siti Aminah',password:'123',kelas:'VII B'}},
   sma:{'2001':{nama:'Agus Wijaya',password:'123',kelas:'X IPA 1'},'2002':{nama:'Dewi Lestari',password:'123',kelas:'X IPS 1'}}
 };
 const DEFAULT_CANDIDATES={
-  smp:{1:{label:'Paslon SMP 1',ketuaNama:'Calon Ketua SMP 1',ketuaFoto:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=compress&w=300',ketuaKelas:'VIII A',wakilNama:'Calon Wakil SMP 1',wakilFoto:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=compress&w=300',wakilKelas:'VIII B',visi:'Mewujudkan OSIS SMP yang aktif, berprestasi, dan berkarakter.'},2:{label:'Paslon SMP 2',ketuaNama:'Calon Ketua SMP 2',ketuaFoto:'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=compress&w=300',ketuaKelas:'VIII B',wakilNama:'Calon Wakil SMP 2',wakilFoto:'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=compress&w=300',wakilKelas:'VIII A',visi:'Membangun sekolah SMP yang disiplin, kreatif, dan menyenangkan.'}},
-  sma:{1:{label:'Paslon SMA 1',ketuaNama:'Calon Ketua SMA 1',ketuaFoto:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=compress&w=300',ketuaKelas:'XI IPA',wakilNama:'Calon Wakil SMA 1',wakilFoto:'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=compress&w=300',wakilKelas:'XI IPS',visi:'Mewujudkan OSIS SMA yang inovatif, aspiratif, dan unggul.'},2:{label:'Paslon SMA 2',ketuaNama:'Calon Ketua SMA 2',ketuaFoto:'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=compress&w=300',ketuaKelas:'XI IPS',wakilNama:'Calon Wakil SMA 2',wakilFoto:'https://images.unsplash.com/photo-1489980557514-251d61e3eeb6?auto=compress&w=300',wakilKelas:'XI IPA',visi:'Menciptakan lingkungan SMA yang kolaboratif dan berprestasi.'}}
+  smp:{1:{label:'Paslon SMP 1',ketuaNama:'Calon Ketua SMP 1',ketuaFoto:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=compress&w=300',ketuaKelas:'VIII A',wakilNama:'Calon Wakil SMP 1',wakilFoto:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=compress&w=300',wakilKelas:'VIII B',visi:'Mewujudkan OSIS SMP yang aktif, berprestasi, dan berkarakter.',misi:'Meningkatkan partisipasi siswa dalam kegiatan sekolah dan menjaga kekompakan antar kelas.',program:'Kelas kreatif mingguan, mading digital, dan jam curhat OSIS.'},2:{label:'Paslon SMP 2',ketuaNama:'Calon Ketua SMP 2',ketuaFoto:'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=compress&w=300',ketuaKelas:'VIII B',wakilNama:'Calon Wakil SMP 2',wakilFoto:'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=compress&w=300',wakilKelas:'VIII A',visi:'Membangun sekolah SMP yang disiplin, kreatif, dan menyenangkan.',misi:'Menumbuhkan budaya disiplin positif dan mewadahi kreativitas siswa.',program:'Piket kebersihan berhadiah, festival seni kelas, dan kotak aspirasi siswa.'}},
+  sma:{1:{label:'Paslon SMA 1',ketuaNama:'Calon Ketua SMA 1',ketuaFoto:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=compress&w=300',ketuaKelas:'XI IPA',wakilNama:'Calon Wakil SMA 1',wakilFoto:'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=compress&w=300',wakilKelas:'XI IPS',visi:'Mewujudkan OSIS SMA yang inovatif, aspiratif, dan unggul.',misi:'Membuka ruang aspirasi siswa dan mendorong inovasi kegiatan sekolah.',program:'Forum aspirasi bulanan, pelatihan kepemimpinan, dan bazar karya siswa.'},2:{label:'Paslon SMA 2',ketuaNama:'Calon Ketua SMA 2',ketuaFoto:'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=compress&w=300',ketuaKelas:'XI IPS',wakilNama:'Calon Wakil SMA 2',wakilFoto:'https://images.unsplash.com/photo-1489980557514-251d61e3eeb6?auto=compress&w=300',wakilKelas:'XI IPA',visi:'Menciptakan lingkungan SMA yang kolaboratif dan berprestasi.',misi:'Memperkuat kerja sama antar ekstrakurikuler dan mendukung prestasi siswa.',program:'Turnamen antar ekskul, mentoring akademik sebaya, dan apresiasi siswa berprestasi.'}}
 };
 
 const path=(lvl,p='')=>db.ref(`elections/${lvl}/${p}`);
@@ -360,7 +406,31 @@ function toast(x,actionLabel,actionFn){
   $('toast').classList.remove('hidden');clearTimeout(window.t);window.t=setTimeout(()=>$('toast').classList.add('hidden'),actionLabel?6500:3800);
 }
 function showPage(id){document.querySelectorAll('main > .panel').forEach(x=>x.classList.add('hidden'));$(id).classList.remove('hidden');scrollTo(0,0)}
-function chooseLevel(x){level=x;$('login-level').textContent=x.toUpperCase();showPage('login-page')}
+function chooseLevel(x){
+  if(x==='smp'&&stageCache.current!=='smp'){toast('Voting SMP belum dibuka. Saat ini masih tahap voting SMA.');return;}
+  level=x;$('login-level').textContent=x.toUpperCase();showPage('login-page');
+}
+function seedStageIfEmpty(){db.ref('stage').once('value').then(s=>{if(!s.exists())db.ref('stage').set({current:'sma'});});}
+seedStageIfEmpty();
+db.ref('stage').on('value',s=>{stageCache=s.val()||{current:'sma'};updateStageUI();});
+function updateStageUI(){
+  let smpUnlocked=stageCache.current==='smp';
+  $('level-smp')?.classList.toggle('locked',!smpUnlocked);
+  if($('btn-smp'))$('btn-smp').textContent=smpUnlocked?'Masuk SMP →':'🔒 Menunggu tahap SMA';
+  if($('level-smp-desc'))$('level-smp-desc').textContent=smpUnlocked?'Pemilihan Ketua & Wakil OSIS SMP · Tahap 2':'Terkunci sampai voting SMA selesai';
+  if($('stage-note'))$('stage-note').textContent=smpUnlocked?'Tahap SMP sedang berlangsung.':'Tahap saat ini: voting SMA. SMP menyusul setelah SMA selesai.';
+  if($('stage-current-label'))$('stage-current-label').textContent=smpUnlocked?'SMP (berlangsung)':'SMA (berlangsung)';
+  $('advanceStageBtn')?.classList.toggle('hidden',smpUnlocked);
+  $('revertStageBtn')?.classList.toggle('hidden',!smpUnlocked);
+}
+function advanceStage(){
+  if(!confirm('Lanjutkan ke tahap SMP? Siswa SMP baru bisa mulai login setelah ini.'))return;
+  db.ref('stage').set({current:'smp'}).then(()=>{logAction('sma',`Tahap SMA ditutup, dilanjutkan ke tahap SMP oleh ${currentAdminName}.`);logAction('smp',`Tahap SMP dibuka oleh ${currentAdminName}.`);renderLogs();toast('Tahap SMP kini dibuka untuk siswa.');});
+}
+function revertStage(){
+  if(!confirm('Kembali ke tahap SMA?'))return;
+  db.ref('stage').set({current:'sma'}).then(()=>{logAction(adminLevel,`Tahap dikembalikan ke SMA oleh ${currentAdminName}.`);renderLogs();toast('Kembali ke tahap SMA.');});
+}
 function togglePassword(){let x=$('password');x.type=x.type==='password'?'text':'password'}
 function safe(x){return String(x==null?'':x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function showForgot(){toast('Hubungi panitia OSIS di sekolah untuk mengatur ulang passwordmu.')}
@@ -409,6 +479,7 @@ function login(){
     showPage('admin-page');setAdminLevel(adminLevel);toast('Login panitia berhasil, halo '+extraAdmin.nama);return;
   }
   if(!level)return toast('Pilih jenjang terlebih dahulu.');
+  if(level==='smp'&&stageCache.current!=='smp')return toast('Voting SMP belum dibuka. Saat ini masih tahap voting SMA.');
   $('loginBtn').disabled=true;
   path(level,'config').once('value').then(s=>{
     if(!(s.val()||{}).isOpen)throw'closed';
@@ -454,6 +525,8 @@ function renderCandidates(){
       <div class="person"><img src="${safe(c.ketuaFoto)}" alt="Ketua ${safe(c.label)}"><b>${safe(c.ketuaNama)}</b><small>Ketua · ${safe(c.ketuaKelas)}</small></div>
       <div class="person"><img src="${safe(c.wakilFoto)}" alt="Wakil ${safe(c.label)}"><b>${safe(c.wakilNama)}</b><small>Wakil · ${safe(c.wakilKelas)}</small></div>
       </div><div class="vision"><strong>Visi</strong>${safe(c.visi)}</div>
+      ${c.misi?`<div class="vision"><strong>Misi</strong>${safe(c.misi)}</div>`:''}
+      ${c.program?`<div class="vision"><strong>Program Kerja</strong>${safe(c.program)}</div>`:''}
       <button class="btn primary full" onclick="prepare('${id}')">Pilih Nomor ${safe(id)} →</button></article>`;
   }).join('');
   $('candidates-list').innerHTML=html||'<p class="sub">Belum ada pasangan calon untuk jenjang ini.</p>';
@@ -577,6 +650,10 @@ function setAdminLevel(x){
   adminLevel=x;
   $('admin-level').value=x;
   $('admin-level-label').textContent=x.toUpperCase();$('stats-level-label').textContent=x.toUpperCase();
+  $('feed-level-label').textContent=x.toUpperCase();$('reveal-level-label').textContent=x.toUpperCase();
+  resultsRevealed=false;revealToken++;stopSuspense();if(raceTimer){clearInterval(raceTimer);raceTimer=null;}$('results-wrap').classList.add('hidden');$('reveal-card').classList.remove('hidden');
+  if(chart){chart.destroy();chart=null;}
+  if(trendChart){trendChart.destroy();trendChart=null;}
 
   sessionStorage.setItem(
     'svote',
@@ -608,42 +685,147 @@ function attachAdminListener(lvl){
   adminVotesRef=path(lvl,'');
   adminVotesRef.on('value',s=>{
     let d=s.val()||{};votesCache=d.votes||{};votersCache=d.voters||{};
-    renderStats();renderChart();renderTrendChart();filterStudents();
+    renderFeed();filterStudents();
+    if(resultsRevealed){renderStats();renderChart();renderTrendChart();}
   });
 }
-function renderTrendChart(){
+function renderFeed(){
+  let students=studentsCache[adminLevel]||{};
+  let entries=Object.entries(votersCache).map(([nis,v])=>({nis,nama:(students[nis]||{}).nama||('NIS '+nis),at:(v&&v.at)||0}));
+  entries.sort((a,b)=>b.at-a.at);entries=entries.slice(0,20);
+  $('feed-list').innerHTML=entries.length?entries.map(e=>`<div class="feed-item">🎉&nbsp;<b>${safe(e.nama)}</b>&nbsp;baru saja memilih · <span style="color:var(--muted)">${e.at?new Date(e.at).toLocaleTimeString('id-ID'):'-'}</span></div>`).join(''):'<p class="sub">Belum ada yang memilih.</p>';
+}
+function countUp(el,to,dur){
+  dur=dur||1300;let start=null;
+  function step(ts){
+    if(!start)start=ts;
+    let p=Math.min((ts-start)/dur,1);
+    let eased=1-Math.pow(1-p,3);
+    el.textContent=Math.round(to*eased);
+    if(p<1)requestAnimationFrame(step);else el.textContent=to;
+  }
+  requestAnimationFrame(step);
+}
+function revealResults(){
+  const myToken=++revealToken;
+  $('reveal-card').classList.add('hidden');
+  $('results-wrap').classList.remove('hidden');
+  resultsRevealed=true;
+  if(chart){chart.destroy();chart=null;}
+  if(trendChart){trendChart.destroy();trendChart=null;}
+  renderStats(true,myToken);
+  setTimeout(()=>{if(myToken===revealToken){renderChart(true,myToken);renderTrendChart(true);}},13000);
+}
+function hideResults(){
+  revealToken++;stopSuspense();
+  if(raceTimer){clearInterval(raceTimer);raceTimer=null;}
+  resultsRevealed=false;
+  $('results-wrap').classList.add('hidden');
+  $('reveal-card').classList.remove('hidden');
+}
+function renderTrendChart(dramatic){
   let hours=new Array(24).fill(0);
   Object.values(votersCache).forEach(v=>{if(v&&v.at)hours[new Date(v.at).getHours()]++;});
   let labels=hours.map((_,h)=>h.toString().padStart(2,'0')+':00');
   if(trendChart)trendChart.destroy();
-  trendChart=new Chart($('trendChart'),{type:'bar',data:{labels,datasets:[{label:'Jumlah suara',data:hours,backgroundColor:'#c8962c'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
+  trendChart=new Chart($('trendChart'),{type:'bar',data:{labels,datasets:[{label:'Jumlah suara',data:hours,backgroundColor:'#c8962c'}]},options:{responsive:true,animation:{duration:dramatic?9000:700,easing:dramatic?'easeOutQuart':'easeOutQuart'},plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
 }
-function renderStats(){
+function renderStats(dramatic,token){
   let students=studentsCache[adminLevel]||{};
   let total=Object.keys(students).length,count=Object.keys(votersCache).length;
   let p=total?count/total*100:0;
-  $('stat-total').textContent=total;$('stat-voted').textContent=count;$('stat-unvoted').textContent=Math.max(0,total-count);
-  $('turnout').textContent=p.toFixed(1)+'\% ('+count+'/'+total+')';$('turnout-bar').style.width=p+'%';
-  let cands=candidatesCache[adminLevel]||{};let ids=Object.keys(cands);
+  let byKelas={};Object.entries(students).forEach(([nis,st])=>{let k=st.kelas||'Tanpa kelas';byKelas[k]=byKelas[k]||{total:0,voted:0};byKelas[k].total++;if(votersCache[nis])byKelas[k].voted++;});
+  let kelasHtml=Object.keys(byKelas).sort().map(k=>{let d=byKelas[k];let pct=d.total?d.voted/d.total*100:0;
+    return `<div class="kelas-row"><span>${safe(k)}</span><div class="progress"><i style="width:${dramatic?0:pct}%" data-target="${pct}"></i></div><span>${d.voted}/${d.total}</span></div>`;
+  }).join('')||'<p class="sub" style="text-align:left;margin:0">Belum ada data siswa.</p>';
+
+  if(dramatic){
+    $('stat-total').textContent='0';$('stat-voted').textContent='0';$('stat-unvoted').textContent='0';
+    $('turnout').textContent='0% (0/'+total+')';
+    $('turnout-bar').style.transition='none';$('turnout-bar').style.width='0%';
+    void $('turnout-bar').offsetWidth;$('turnout-bar').style.transition='';
+    $('kelas-bars').innerHTML=kelasHtml;
+    $('admin-winner').classList.remove('reveal');
+    startSuspense();
+    setTimeout(()=>{
+      if(token!==revealToken)return;
+      stopSuspense();
+      countUp($('stat-total'),total,7000);countUp($('stat-voted'),count,7000);countUp($('stat-unvoted'),Math.max(0,total-count),7000);
+      $('turnout').textContent=p.toFixed(1)+'% ('+count+'/'+total+')';$('turnout-bar').style.width=p+'%';
+      document.querySelectorAll('#kelas-bars .progress i').forEach(el=>{el.style.width=el.dataset.target+'%';});
+    },4000);
+    setTimeout(()=>{if(token===revealToken)$('admin-winner').textContent='📊 Menyiapkan grafik suara…';},11000);
+  }else{
+    $('stat-total').textContent=total;$('stat-voted').textContent=count;$('stat-unvoted').textContent=Math.max(0,total-count);
+    $('turnout').textContent=p.toFixed(1)+'% ('+count+'/'+total+')';$('turnout-bar').style.width=p+'%';
+    $('kelas-bars').innerHTML=kelasHtml;
+    document.querySelectorAll('#kelas-bars .progress i').forEach(el=>{el.style.width=el.dataset.target+'%';});
+    let cands=candidatesCache[adminLevel]||{};let ids=Object.keys(cands);
+    let sum=ids.reduce((a,id)=>a+(+votesCache[id]||0),0);
+    if(!sum){$('admin-winner').textContent='📊 Belum ada suara yang masuk';}
+    else{
+      let best=ids.reduce((a,b)=>(+votesCache[a]||0)>=(+votesCache[b]||0)?a:b);
+      let bestVotes=+votesCache[best]||0;let tie=ids.filter(id=>(+votesCache[id]||0)===bestVotes).length>1;
+      $('admin-winner').textContent=tie?'⚖️ Sementara imbang':`🏆 ${safe(cands[best].label)} memimpin (${(bestVotes/sum*100).toFixed(1)}%)`;
+    }
+  }
+}
+function revealChartWinner(ids,cands){
   let sum=ids.reduce((a,id)=>a+(+votesCache[id]||0),0);
-  if(!sum){$('admin-winner').textContent='📊 Belum ada suara yang masuk';}
-  else{
+  let palette=['#0b1024','#c8962c','#2f8f5b','#8a3226','#5b4b8a'];
+  if(!sum){
+    $('admin-winner').textContent='📊 Belum ada suara yang masuk';
+  }else{
     let best=ids.reduce((a,b)=>(+votesCache[a]||0)>=(+votesCache[b]||0)?a:b);
     let bestVotes=+votesCache[best]||0;let tie=ids.filter(id=>(+votesCache[id]||0)===bestVotes).length>1;
-    $('admin-winner').textContent=tie?'⚖️ Sementara imbang':`🏆 ${safe(cands[best].label)} memimpin (${(bestVotes/sum*100).toFixed(1)}%)`;
+    if(chart){
+      chart.data.datasets[0].backgroundColor=ids.map((id,i)=>tie?palette[i%palette.length]:(id===best?'#c8962c':'#d9d5c8'));
+      chart.update('none');
+    }
+    $('admin-winner').textContent=tie?'⚖️ Hasil sementara imbang!':`🏆 ${safe(cands[best].label)} TERPILIH dengan ${(bestVotes/sum*100).toFixed(1)}% suara! 🎉`;
   }
-  let byKelas={};Object.entries(students).forEach(([nis,st])=>{let k=st.kelas||'Tanpa kelas';byKelas[k]=byKelas[k]||{total:0,voted:0};byKelas[k].total++;if(votersCache[nis])byKelas[k].voted++;});
-  $('kelas-bars').innerHTML=Object.keys(byKelas).sort().map(k=>{let d=byKelas[k];let pct=d.total?d.voted/d.total*100:0;
-    return `<div class="kelas-row"><span>${safe(k)}</span><div class="progress"><i style="width:${pct}%"></i></div><span>${d.voted}/${d.total}</span></div>`;
-  }).join('')||'<p class="sub" style="text-align:left;margin:0">Belum ada data siswa.</p>';
+  $('admin-winner').classList.remove('reveal');void $('admin-winner').offsetWidth;$('admin-winner').classList.add('reveal');
 }
-function renderChart(){
+let raceTimer=null;
+function renderChart(dramatic,token){
   let cands=candidatesCache[adminLevel]||{};let ids=Object.keys(cands);
-  let labels=ids.map(id=>{let sum=ids.reduce((a,i)=>a+(+votesCache[i]||0),0);let v=+votesCache[id]||0;return `${cands[id].label} (${sum?(v/sum*100).toFixed(1):'0.0'}%)`;});
-  let data=ids.map(id=>+votesCache[id]||0);
+  let labels=ids.map(id=>cands[id].label);
+  let finalData=ids.map(id=>+votesCache[id]||0);
+  let palette=['#0b1024','#c8962c','#2f8f5b','#8a3226','#5b4b8a'];
+  if(raceTimer){clearInterval(raceTimer);raceTimer=null;}
   if(chart)chart.destroy();
   if(!ids.length)return;
-  chart=new Chart($('chart'),{type:$('chartType').value,data:{labels,datasets:[{data,backgroundColor:['#0b1024','#c8962c','#2f8f5b','#8a3226','#5b4b8a']}]},options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:$('chartType').value==='bar'?{y:{beginAtZero:true,ticks:{stepSize:1}}}:{}}});
+  let sum=finalData.reduce((a,b)=>a+b,0);
+  let tooltipFn=(ctx)=>{let v=ctx.parsed.y;let pct=sum?(v/sum*100).toFixed(1):'0.0';return `${v} suara (${pct}%)`;};
+
+  if(!dramatic){
+    chart=new Chart($('chart'),{type:'bar',data:{labels,datasets:[{data:finalData,backgroundColor:ids.map((_,i)=>palette[i%palette.length])}]},options:{responsive:true,animation:{duration:700,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:{callbacks:{label:tooltipFn}}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
+    return;
+  }
+
+  /* dramatic: a "kejar-kejaran" race — the eventual winner starts slow and
+     surges late, the others sprint early and fade — so the lead swaps hands
+     a few times, but the bars can only ever settle on the true, real tally. */
+  let winnerIdx=finalData.indexOf(Math.max(...finalData));
+  let curveExp=ids.map((_,i)=>i===winnerIdx?3.2:(1.5+Math.random()*0.9));
+  chart=new Chart($('chart'),{type:'bar',data:{labels,datasets:[{data:ids.map(()=>0),backgroundColor:ids.map((_,i)=>palette[i%palette.length])}]},options:{responsive:true,animation:{duration:220,easing:'linear'},plugins:{legend:{display:false},tooltip:{callbacks:{label:tooltipFn}}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
+
+  const totalDur=15000,stepMs=180,t0=Date.now();
+  raceTimer=setInterval(()=>{
+    if(token!==undefined&&token!==revealToken){clearInterval(raceTimer);raceTimer=null;return;}
+    let tNorm=Math.min((Date.now()-t0)/totalDur,1);
+    let vals=finalData.map((fin,i)=>{
+      let p=curveExp[i];
+      let frac=i===winnerIdx?Math.pow(tNorm,p):(1-Math.pow(1-tNorm,p));
+      return Math.round(fin*frac);
+    });
+    chart.data.datasets[0].data=vals;chart.update();
+    if(tNorm>=1){
+      clearInterval(raceTimer);raceTimer=null;
+      chart.data.datasets[0].data=finalData.slice();chart.update();
+      revealChartWinner(ids,cands);
+    }
+  },stepMs);
 }
 
 /* ---------- admin: siswa CRUD ---------- */
@@ -769,7 +951,9 @@ function openCandidateModal(id){
       <div class="field"><label>Kelas Wakil</label><input id="m-wakilKelas" value="${safe(c.wakilKelas||'')}" placeholder="Contoh: IX C"></div>
     </div>
     <div class="field"><label>Foto Wakil (URL)</label><input id="m-wakilFoto" value="${safe(c.wakilFoto||'')}"></div>
-    <div class="field"><label>Visi &amp; misi singkat</label><textarea id="m-visi" rows="3" oninput="updateCandPreview()">${safe(c.visi||'')}</textarea></div>
+    <div class="field"><label>Visi</label><textarea id="m-visi" rows="2" oninput="updateCandPreview()">${safe(c.visi||'')}</textarea></div>
+    <div class="field"><label>Misi</label><textarea id="m-misi" rows="3" oninput="updateCandPreview()">${safe(c.misi||'')}</textarea></div>
+    <div class="field"><label>Program kerja</label><textarea id="m-program" rows="3" oninput="updateCandPreview()">${safe(c.program||'')}</textarea></div>
     <div class="cand-preview-wrap"><h4>Pratinjau kartu</h4><div id="cand-preview"></div></div>
     <div class="actions"><button class="btn primary" onclick="saveCandidate()">Simpan</button><button class="btn ghost" onclick="closeModal()">Batal</button></div>
   </div></div>`;
@@ -781,16 +965,20 @@ function updateCandPreview(){
     <h3>${get('m-label')||'Nama paslon'}</h3><div class="people">
     <div class="person"><img src="${safe($('m-ketuaFoto').value||'https://placehold.co/80')}" alt=""><b>${get('m-ketuaNama')||'Nama ketua'}</b><small>Ketua · ${get('m-ketuaKelas')}</small></div>
     <div class="person"><img src="${safe($('m-wakilFoto').value||'https://placehold.co/80')}" alt=""><b>${get('m-wakilNama')||'Nama wakil'}</b><small>Wakil · ${get('m-wakilKelas')}</small></div>
-    </div></article>`;
+    </div>
+    ${get('m-visi')?`<div class="vision"><strong>Visi</strong>${get('m-visi')}</div>`:''}
+    ${get('m-misi')?`<div class="vision"><strong>Misi</strong>${get('m-misi')}</div>`:''}
+    ${get('m-program')?`<div class="vision"><strong>Program Kerja</strong>${get('m-program')}</div>`:''}
+    </article>`;
 }
 function saveCandidate(){
   let id=$('m-cid').value;
   let label=$('m-label').value.trim();
   let ketuaNama=$('m-ketuaNama').value.trim(),ketuaFoto=$('m-ketuaFoto').value.trim(),ketuaKelas=$('m-ketuaKelas').value.trim();
   let wakilNama=$('m-wakilNama').value.trim(),wakilFoto=$('m-wakilFoto').value.trim(),wakilKelas=$('m-wakilKelas').value.trim();
-  let visi=$('m-visi').value.trim();
+  let visi=$('m-visi').value.trim(),misi=$('m-misi').value.trim(),program=$('m-program').value.trim();
   if(!label||!ketuaNama||!wakilNama)return toast('Nama paslon, ketua, dan wakil wajib diisi.');
-  path(adminLevel,'candidates/'+id).set({label,ketuaNama,ketuaFoto,ketuaKelas,wakilNama,wakilFoto,wakilKelas,visi}).then(()=>{
+  path(adminLevel,'candidates/'+id).set({label,ketuaNama,ketuaFoto,ketuaKelas,wakilNama,wakilFoto,wakilKelas,visi,misi,program}).then(()=>{
     logAction(adminLevel,`Paslon "${label}" ${editingCandidateId?'diperbarui':'ditambahkan'}.`);renderLogs();closeModal();toast('Data paslon disimpan.');
   });
 }
