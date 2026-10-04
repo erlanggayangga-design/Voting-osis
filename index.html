@@ -353,7 +353,14 @@ main{max-width:1080px;margin:auto;padding:36px 16px 70px}
 
   <div class="tab-content hidden" id="tab-paslon">
     <div class="section">
-      <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">Pasangan calon</h3><button class="btn gold small-btn" onclick="openCandidateModal()">+ Tambah paslon</button></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <h3 style="margin:0">Pasangan calon</h3>
+        <div class="actions" style="flex:none">
+          <button class="btn ghost small-btn" onclick="importPosterCandidates()">📋 Impor 3 Paslon dari Poster</button>
+          <button class="btn gold small-btn" onclick="openCandidateModal()">+ Tambah paslon</button>
+        </div>
+      </div>
+      <p class="sub" style="text-align:left;margin:10px 0 0">Impor poster akan menambahkan visi/misi/program kerja otomatis — foto &amp; kelas tetap perlu diisi manual lewat tombol Edit.</p>
       <div id="admin-candidates" style="margin-top:12px"></div>
     </div>
   </div>
@@ -417,15 +424,6 @@ function startSuspense(){
 }
 function stopSuspense(){if(suspenseTimer){clearInterval(suspenseTimer);suspenseTimer=null;}}
 
-const DEFAULT_STUDENTS={
-  smp:{'1001':{nama:'Budi Santoso',password:'123',kelas:'VII A'},'1002':{nama:'Siti Aminah',password:'123',kelas:'VII B'}},
-  sma:{'2001':{nama:'Agus Wijaya',password:'123',kelas:'X IPA 1'},'2002':{nama:'Dewi Lestari',password:'123',kelas:'X IPS 1'}}
-};
-const DEFAULT_CANDIDATES={
-  smp:{1:{label:'Paslon SMP 1',ketuaNama:'Calon Ketua SMP 1',ketuaFoto:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=compress&w=300',ketuaKelas:'VIII A',wakilNama:'Calon Wakil SMP 1',wakilFoto:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=compress&w=300',wakilKelas:'VIII B',visi:'Mewujudkan OSIS SMP yang aktif, berprestasi, dan berkarakter.',misi:'Meningkatkan partisipasi siswa dalam kegiatan sekolah dan menjaga kekompakan antar kelas.',program:'Kelas kreatif mingguan, mading digital, dan jam curhat OSIS.'},2:{label:'Paslon SMP 2',ketuaNama:'Calon Ketua SMP 2',ketuaFoto:'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=compress&w=300',ketuaKelas:'VIII B',wakilNama:'Calon Wakil SMP 2',wakilFoto:'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=compress&w=300',wakilKelas:'VIII A',visi:'Membangun sekolah SMP yang disiplin, kreatif, dan menyenangkan.',misi:'Menumbuhkan budaya disiplin positif dan mewadahi kreativitas siswa.',program:'Piket kebersihan berhadiah, festival seni kelas, dan kotak aspirasi siswa.'}},
-  sma:{1:{label:'Paslon SMA 1',ketuaNama:'Calon Ketua SMA 1',ketuaFoto:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=compress&w=300',ketuaKelas:'XI IPA',wakilNama:'Calon Wakil SMA 1',wakilFoto:'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=compress&w=300',wakilKelas:'XI IPS',visi:'Mewujudkan OSIS SMA yang inovatif, aspiratif, dan unggul.',misi:'Membuka ruang aspirasi siswa dan mendorong inovasi kegiatan sekolah.',program:'Forum aspirasi bulanan, pelatihan kepemimpinan, dan bazar karya siswa.'},2:{label:'Paslon SMA 2',ketuaNama:'Calon Ketua SMA 2',ketuaFoto:'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=compress&w=300',ketuaKelas:'XI IPS',wakilNama:'Calon Wakil SMA 2',wakilFoto:'https://images.unsplash.com/photo-1489980557514-251d61e3eeb6?auto=compress&w=300',wakilKelas:'XI IPA',visi:'Menciptakan lingkungan SMA yang kolaboratif dan berprestasi.',misi:'Memperkuat kerja sama antar ekstrakurikuler dan mendukung prestasi siswa.',program:'Turnamen antar ekskul, mentoring akademik sebaya, dan apresiasi siswa berprestasi.'}}
-};
-
 const path=(lvl,p='')=>db.ref(`elections/${lvl}/${p}`);
 function toast(x,actionLabel,actionFn){
   $('toast').innerHTML=`<span>${safe(x)}</span>`+(actionLabel?`<button id="toastAction">${safe(actionLabel)}</button>`:'');
@@ -460,21 +458,16 @@ function updateStageUI(){
 }
 function advanceStage(){
   if(!confirm('Lanjutkan ke tahap SMP? Siswa SMP baru bisa mulai login setelah ini.'))return;
-  db.ref('stage').set({current:'smp'}).then(()=>{logAction('sma',`Tahap SMA ditutup, dilanjutkan ke tahap SMP oleh ${currentAdminName}.`);logAction('smp',`Tahap SMP dibuka oleh ${currentAdminName}.`);renderLogs();toast('Tahap SMP kini dibuka untuk siswa.');});
+  db.ref('stage').set({current:'smp'}).then(()=>{logAction('sma',`Tahap SMA ditutup, dilanjutkan ke tahap SMP oleh ${currentAdminName}.`);logAction('smp',`Tahap SMP dibuka oleh ${currentAdminName}.`);renderLogs();toast('Tahap SMP kini dibuka untuk siswa.');}).catch(fberr);
 }
 function revertStage(){
   if(!confirm('Kembali ke tahap SMA?'))return;
-  db.ref('stage').set({current:'sma'}).then(()=>{logAction(adminLevel,`Tahap dikembalikan ke SMA oleh ${currentAdminName}.`);renderLogs();toast('Kembali ke tahap SMA.');});
+  db.ref('stage').set({current:'sma'}).then(()=>{logAction(adminLevel,`Tahap dikembalikan ke SMA oleh ${currentAdminName}.`);renderLogs();toast('Kembali ke tahap SMA.');}).catch(fberr);
 }
 function togglePassword(){let x=$('password');x.type=x.type==='password'?'text':'password'}
 function safe(x){return String(x==null?'':x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function showForgot(){toast('Hubungi panitia OSIS di sekolah untuk mengatur ulang passwordmu.')}
-
-function seedIfEmpty(lvl){
-  path(lvl,'students').once('value').then(s=>{if(!s.exists())path(lvl,'students').set(DEFAULT_STUDENTS[lvl])});
-  path(lvl,'candidates').once('value').then(s=>{if(!s.exists())path(lvl,'candidates').set(DEFAULT_CANDIDATES[lvl])});
-}
-seedIfEmpty('smp');seedIfEmpty('sma');
+function fberr(e){toast('Gagal: '+(e&&e.message?e.message:'cek koneksi internet / aturan keamanan Firebase.'));console.error(e);}
 
 function logAction(lvl,text){path(lvl,'logs').push({at:Date.now(),text});}
 function renderLogs(){
@@ -892,23 +885,23 @@ function copyStudentToOtherLevel(nis){
     path(target,'students/'+nis).set({nama:s.nama,password:s.password,kelas:''}).then(()=>{
       logAction(adminLevel,`Siswa ${s.nama} (NIS ${nis}) disalin ke jenjang ${target.toUpperCase()}.`);renderLogs();
       toast('Siswa disalin ke OSIS '+target.toUpperCase()+'. Jangan lupa isi kelasnya.');
-    });
-  });
+    }).catch(fberr);
+  }).catch(fberr);
 }
 function resetStudentPassword(nis){
   let newPass=Math.random().toString().slice(2,8);
   path(adminLevel,'students/'+nis+'/password').set(newPass).then(()=>{
     logAction(adminLevel,`Password siswa NIS ${nis} direset oleh panitia.`);renderLogs();
     alert('Password baru untuk NIS '+nis+': '+newPass+'\nSampaikan ke siswa secara langsung.');
-  });
+  }).catch(fberr);
 }
 function deleteStudent(nis){
   if(!confirm('Hapus siswa dengan NIS '+nis+'?'))return;
   let data=(studentsCache[adminLevel]||{})[nis];let lvl=adminLevel;
   path(lvl,'students/'+nis).remove().then(()=>{
     logAction(lvl,`Siswa NIS ${nis} dihapus oleh ${currentAdminName}.`);renderLogs();
-    toast('Siswa dihapus.','Urungkan',()=>{path(lvl,'students/'+nis).set(data).then(()=>{logAction(lvl,`Penghapusan siswa NIS ${nis} diurungkan.`);renderLogs();});});
-  });
+    toast('Siswa dihapus.','Urungkan',()=>{path(lvl,'students/'+nis).set(data).then(()=>{logAction(lvl,`Penghapusan siswa NIS ${nis} diurungkan.`);renderLogs();}).catch(fberr);});
+  }).catch(fberr);
 }
 function openStudentModal(nis){
   editingStudentNis=nis||null;
@@ -928,7 +921,7 @@ function saveStudent(){
   path(adminLevel,'students/'+nis).set({nama,kelas,password:pass}).then(()=>{
     logAction(adminLevel,`Siswa ${nama} (NIS ${nis}) ${editingStudentNis?'diperbarui':'ditambahkan'}.`);renderLogs();
     closeModal();toast('Data siswa disimpan.');
-  });
+  }).catch(fberr);
 }
 function importCSV(ev){
   let file=ev.target.files[0];if(!file)return;
@@ -942,12 +935,50 @@ function importCSV(ev){
       updates[nis]={nama,password:pass||'123',kelas:kelas||''};count++;
     });
     if(!count)return toast('Tidak ada baris valid ditemukan di file CSV.');
-    path(adminLevel,'students').update(updates).then(()=>{logAction(adminLevel,`Impor CSV: ${count} siswa ditambahkan/diperbarui.`);renderLogs();toast(count+' siswa berhasil diimpor.');});
+    path(adminLevel,'students').update(updates).then(()=>{logAction(adminLevel,`Impor CSV: ${count} siswa ditambahkan/diperbarui.`);renderLogs();toast(count+' siswa berhasil diimpor.');}).catch(fberr);
   };
   reader.readAsText(file);ev.target.value='';
 }
 
 /* ---------- admin: kandidat CRUD ---------- */
+function importPosterCandidates(){
+  if(!confirm('Tambahkan 3 pasangan calon dari poster ke jenjang '+adminLevel.toUpperCase()+'? Foto & kelas perlu diisi manual sesudahnya lewat tombol Edit.'))return;
+  let existing=candidatesCache[adminLevel]||{};
+  let nextId=Math.max(0,...Object.keys(existing).map(Number));
+  if(!isFinite(nextId))nextId=0;
+  const posterCandidates=[
+    {
+      label:'Alesia Zahra & Vania Almufidah',
+      ketuaNama:'Alesia Zahra',ketuaFoto:'',ketuaKelas:'',
+      wakilNama:'Vania Almufidah',wakilFoto:'',wakilKelas:'',
+      visi:'Mewujudkan OSIS SNT 17 sebagai organisasi siswa yang berintegritas, kolaboratif, inovatif, dan responsif dalam membangun budaya sekolah yang positif, inklusif, dan berkelanjutan.',
+      misi:'1) Membangun sikap disiplin, bertanggung jawab, jujur, dan berintegritas dalam menjalankan organisasi. 2) Mendorong terciptanya komunikasi dan kolaborasi yang terbuka antara siswa, OSIS, MPS, dan pihak sekolah dalam mewujudkan kegiatan yang bermanfaat. 3) Menyelenggarakan kegiatan yang kreatif, edukatif, dan inklusif sebagai wadah bagi siswa untuk berkarya, berkembang, dan berkontribusi. 4) Membangun budaya saling menghargai dan mendukung melalui kegiatan yang mendorong kebersamaan serta apresiasi terhadap usaha, perkembangan, dan kontribusi siswa. 5) Membangun sistem kerja dan budaya organisasi yang terencana, positif, dan berkelanjutan sebagai fondasi bagi perkembangan OSIS pada periode selanjutnya.',
+      program:''
+    },
+    {
+      label:'Aurelia Febrina & Cinta Aninda Inezzaskia',
+      ketuaNama:'Aurelia Febrina',ketuaFoto:'',ketuaKelas:'',
+      wakilNama:'Cinta Aninda Inezzaskia',wakilFoto:'',wakilKelas:'',
+      visi:'Mewujudkan lingkungan sekolah yang nyaman, berprestasi, berkarakter, dan akrab bagi seluruh warga sekolah.',
+      misi:'NYAMAN: Menciptakan lingkungan sekolah yang bersih, tertib, dan nyaman untuk belajar dan beraktivitas. BERPRESTASI: Mendukung dan memotivasi siswa untuk berprestasi, berbagi ilmu, dan mengembangkan potensi diri. BERKARAKTER: Membangun budaya kejujuran, kedisiplinan, dan tanggung jawab di lingkungan sekolah. AKRAB: Membangun komunikasi yang terbuka, hubungan yang harmonis, dan rasa saling peduli antar warga sekolah.',
+      program:''
+    },
+    {
+      label:'Bunga Rachelia Marcely & Zaquita Siti Ladisha',
+      ketuaNama:'Bunga Rachelia Marcely',ketuaFoto:'',ketuaKelas:'',
+      wakilNama:'Zaquita Siti Ladisha',wakilFoto:'',wakilKelas:'',
+      visi:'Mewujudkan OSIS SNT 17 Tanjung Jabung Timur yang aspiratif, inovatif dan kolaboratif guna menampung aspirasi, mengembangkan kreativitas serta mendorong pengembangan potensi siswa demi membentuk patriot SNT yang aktif, progresif dan berkarakter.',
+      misi:'1) Membuat kegiatan yang dapat meningkatkan minat dan bakat. 2) Menciptakan OSIS yang terbuka terhadap ide, kritik, dan aspirasi. 3) Menumbuhkan sikap disiplin, bertanggung jawab, dan peduli terhadap lingkungan sekolah. 4) Meningkatkan efektivitas kinerja OSIS melalui sistem evaluasi berkala. 5) Membangun kebersamaan tanpa membedakan latar belakang, minat maupun kemampuan siswa. 6) Memperkuat kerjasama antar OSIS, siswa, guru, dan organisasi sekolah lainnya.',
+      program:'1) Nexus (Network for Exchange, eXploration, Unity & Synergy). 2) Spectra (Student Performance, Expression, Creativity, Talent & Artistic Art). 3) 3S (SNT Sharing Session). 4) TTI (Talent To Impact). 5) SNT RAPI (kegiatan kebersihan). 6) Memperingati hari-hari besar.'
+    }
+  ];
+  let writes={};
+  posterCandidates.forEach((c,i)=>{writes[nextId+1+i]=c;});
+  path(adminLevel,'candidates').update(writes).then(()=>{
+    logAction(adminLevel,`Impor 3 paslon dari poster oleh ${currentAdminName}.`);renderLogs();
+    toast('3 paslon berhasil ditambahkan. Jangan lupa isi foto & kelas lewat tombol Edit.');
+  }).catch(fberr);
+}
 function renderAdminCandidates(){
   let list=candidatesCache[adminLevel]||{};
   $('admin-candidates').innerHTML=Object.keys(list).map(id=>{let c=list[id];
@@ -959,12 +990,14 @@ function renderAdminCandidates(){
 function deleteCandidate(id){
   if(!confirm('Hapus pasangan calon ini? Suara yang sudah masuk untuk paslon ini juga akan hilang dari perhitungan.'))return;
   let data=(candidatesCache[adminLevel]||{})[id];let votes=votesCache[id]||0;let lvl=adminLevel;
-  path(lvl,'candidates/'+id).remove();path(lvl,'votes/'+id).remove();
-  logAction(lvl,`Pasangan calon "${data?data.label:id}" dihapus oleh ${currentAdminName}.`);renderLogs();
-  toast('Paslon dihapus.','Urungkan',()=>{
-    path(lvl,'candidates/'+id).set(data);path(lvl,'votes/'+id).set(votes);
-    logAction(lvl,`Penghapusan paslon "${data?data.label:id}" diurungkan.`);renderLogs();
-  });
+  Promise.all([path(lvl,'candidates/'+id).remove(),path(lvl,'votes/'+id).remove()]).then(()=>{
+    logAction(lvl,`Pasangan calon "${data?data.label:id}" dihapus oleh ${currentAdminName}.`);renderLogs();
+    toast('Paslon dihapus.','Urungkan',()=>{
+      Promise.all([path(lvl,'candidates/'+id).set(data),path(lvl,'votes/'+id).set(votes)]).then(()=>{
+        logAction(lvl,`Penghapusan paslon "${data?data.label:id}" diurungkan.`);renderLogs();
+      }).catch(fberr);
+    });
+  }).catch(fberr);
 }
 function openCandidateModal(id){
   editingCandidateId=id||null;
@@ -1015,7 +1048,7 @@ function saveCandidate(){
   if(!label||!ketuaNama||!wakilNama)return toast('Nama paslon, ketua, dan wakil wajib diisi.');
   path(adminLevel,'candidates/'+id).set({label,ketuaNama,ketuaFoto,ketuaKelas,wakilNama,wakilFoto,wakilKelas,visi,misi,program}).then(()=>{
     logAction(adminLevel,`Paslon "${label}" ${editingCandidateId?'diperbarui':'ditambahkan'}.`);renderLogs();closeModal();toast('Data paslon disimpan.');
-  });
+  }).catch(fberr);
 }
 function closeModal(){$('modal-root').innerHTML='';editingStudentNis=null;editingCandidateId=null;editingFaqId=null;editingAdminId=null;}
 
@@ -1024,7 +1057,7 @@ function openVoting(){
   let n=+$('duration').value;let pin=$('pinCode').value.trim();
   path(adminLevel,'config').set({isOpen:true,endTime:n>0?Date.now()+n*60000:null,pin:pin||null,startTime:null}).then(()=>{
     logAction(adminLevel,`Voting dibuka oleh ${currentAdminName}${n>0?` selama ${n} menit`:' tanpa batas waktu'}${pin?' dengan kode konfirmasi':''}.`);renderLogs();toast('Sesi '+adminLevel.toUpperCase()+' dibuka.');
-  });
+  }).catch(fberr);
 }
 function scheduleVoting(){
   let raw=$('scheduleTime').value;if(!raw)return toast('Pilih tanggal dan jam terlebih dahulu.');
@@ -1032,16 +1065,16 @@ function scheduleVoting(){
   let n=+$('duration').value;let pin=$('pinCode').value.trim();
   path(adminLevel,'config').set({isOpen:false,startTime:t,pendingDuration:n>0?n:null,pin:pin||null}).then(()=>{
     logAction(adminLevel,`Voting dijadwalkan otomatis dibuka oleh ${currentAdminName} pada ${new Date(t).toLocaleString('id-ID')}.`);renderLogs();toast('Voting dijadwalkan.');
-  });
+  }).catch(fberr);
 }
 function closeVoting(){
   if(!confirm('Tutup voting jenjang ini?'))return;
-  path(adminLevel,'config').set({isOpen:false,endTime:null,startTime:null}).then(()=>{logAction(adminLevel,`Voting ditutup oleh ${currentAdminName}.`);renderLogs();toast('Voting ditutup.');});
+  path(adminLevel,'config').set({isOpen:false,endTime:null,startTime:null}).then(()=>{logAction(adminLevel,`Voting ditutup oleh ${currentAdminName}.`);renderLogs();toast('Voting ditutup.');}).catch(fberr);
 }
 function resetData(){
   if(!confirm('Reset seluruh data suara jenjang '+adminLevel.toUpperCase()+'? Data siswa dan paslon tidak akan dihapus.'))return;
   let cands=candidatesCache[adminLevel]||{};let zeros={};Object.keys(cands).forEach(id=>zeros[id]=0);
-  path(adminLevel,'').update({votes:zeros,voters:null}).then(()=>{logAction(adminLevel,'Data suara direset oleh panitia.');renderLogs();toast('Data berhasil direset.');});
+  path(adminLevel,'').update({votes:zeros,voters:null}).then(()=>{logAction(adminLevel,'Data suara direset oleh panitia.');renderLogs();toast('Data berhasil direset.');}).catch(fberr);
 }
 function exportCSV(){
   let students=studentsCache[adminLevel]||{};
@@ -1071,14 +1104,14 @@ function saveFaq(id){
   let q=$('m-faq-q').value.trim(),a=$('m-faq-a').value.trim();
   if(!q||!a)return toast('Pertanyaan dan jawaban wajib diisi.');
   let ref=id?db.ref('faq/'+id):db.ref('faq').push();
-  ref.set({q,a}).then(()=>{logAction(adminLevel,`FAQ "${q}" ${id?'diperbarui':'ditambahkan'} oleh ${currentAdminName}.`);renderLogs();closeModal();toast('FAQ disimpan.');});
+  ref.set({q,a}).then(()=>{logAction(adminLevel,`FAQ "${q}" ${id?'diperbarui':'ditambahkan'} oleh ${currentAdminName}.`);renderLogs();closeModal();toast('FAQ disimpan.');}).catch(fberr);
 }
 function deleteFaq(id){
   if(!confirm('Hapus FAQ ini?'))return;
   let data=faqCache[id];
   db.ref('faq/'+id).remove().then(()=>{
-    toast('FAQ dihapus.','Urungkan',()=>db.ref('faq/'+id).set(data));
-  });
+    toast('FAQ dihapus.','Urungkan',()=>db.ref('faq/'+id).set(data).catch(fberr));
+  }).catch(fberr);
 }
 
 /* ---------- admin: akun panitia ---------- */
@@ -1101,11 +1134,11 @@ function saveAdminAccount(){
   let nama=$('m-admin-nama').value.trim(),nis=$('m-admin-nis').value.trim(),pass=$('m-admin-pass').value.trim();
   if(!nama||!nis||!pass)return toast('Semua kolom wajib diisi.');
   if(nis===MASTER_ADMIN.nis)return toast('NIS ini sudah dipakai akun utama, gunakan NIS lain.');
-  db.ref('admins').push({nama,nis,pass}).then(()=>{logAction(adminLevel,`Akun panitia "${nama}" ditambahkan oleh ${currentAdminName}.`);renderLogs();closeModal();toast('Akun panitia ditambahkan.');});
+  db.ref('admins').push({nama,nis,pass}).then(()=>{logAction(adminLevel,`Akun panitia "${nama}" ditambahkan oleh ${currentAdminName}.`);renderLogs();closeModal();toast('Akun panitia ditambahkan.');}).catch(fberr);
 }
 function deleteAdminAccount(id){
   if(!confirm('Hapus akun panitia ini?'))return;
-  db.ref('admins/'+id).remove().then(()=>toast('Akun panitia dihapus.'));
+  db.ref('admins/'+id).remove().then(()=>toast('Akun panitia dihapus.')).catch(fberr);
 }
 
 /* ---------- admin: berita acara PDF ---------- */
