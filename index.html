@@ -21,6 +21,7 @@
 }
 [data-theme=dark]{--navy:#05070f;--navy2:#0d1226;--ink:#eef0f7;--bg:#0a0d1c;--card:#121631;--line:#232a4d;--muted:#9aa0c0;color-scheme:dark}
 *{box-sizing:border-box}
+html,body{overflow-x:hidden}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans)}
 button,input,select{font:inherit}
 button{cursor:pointer}
@@ -186,8 +187,516 @@ main{max-width:1080px;margin:auto;padding:36px 16px 70px}
   .actions,.theme{display:none!important}
 }
 @media(max-width:600px){.level-grid,.stats{grid-template-columns:1fr 1fr}.stats .stat:last-child{grid-column:span 2}.actions{flex-direction:column}.welcome{align-items:flex-start;flex-direction:column}.cand-admin .grid2{grid-template-columns:1fr}}
+
+/* =====================================================================
+   PEMILOS — animasi pengumuman hasil (CSS asli, semua selector diberi
+   awalan .pm-scope / pm- agar tidak bentrok dengan CSS Vote OSIS)
+   ===================================================================== */
+.pm-scope {
+  --bg: #f3f1ea;
+  --card: #ffffff;
+  --ink: #14192d;
+  --line: #e2ddd0;
+  --muted: #646a7d;
+  --gold: #c9962a;
+  --gold-light: #ffe89e;
+  --gold-deep: #8f6512;
+  --crimson: #b81d2a;
+  --green: #268552;
+  --navy: #0d152e;
+  color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, sans-serif;
+}
+[data-theme=dark] .pm-scope {
+  --bg: #090d1a;
+  --card: #11172e;
+  --ink: #edf0f7;
+  --line: #222b4d;
+  --muted: #939bb8;
+}
+.pm-main { max-width: 780px; margin: auto; padding: 18px 14px 60px; position: relative; z-index: 2; }
+
+/* Layar Gelap Saat Detik Kritis (Sudden Death Overlay) */
+#blackout {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, transparent 120px, rgba(5, 8, 22, 0.86) 460px);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .8s ease;
+  z-index: 40;
+}
+#blackout.on { opacity: 1; }
+
+/* Header Resmi OSIS */
+.pm-scope .pm-hero {
+  background: linear-gradient(135deg, #0d152e 0%, #1d2b53 100%);
+  color: #fff;
+  border-radius: 18px;
+  padding: 20px 16px;
+  text-align: center;
+  border: 1px solid #c9962a66;
+  box-shadow: 0 12px 32px rgba(13, 21, 46, 0.25);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.pm-scope .hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(201,150,42,0.2);
+  border: 1px solid #c9962a88;
+  color: #ffe89e;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  padding: 4px 12px;
+  border-radius: 99px;
+  text-transform: uppercase;
+}
+.pm-scope .pm-hero h1 { font: 800 22px/1.25 Georgia, serif; margin: 10px 0 4px; color: #fff; }
+.pm-scope .pm-hero p { margin: 0; color: #b8c2e0; font-size: 13px; }
+
+.pm-scope .pacing-panel {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-top: 14px;
+  text-align: left;
+}
+.pm-scope .pacing-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 12.5px;
+  color: #ffe89e;
+  font-weight: 700;
+}
+.pm-scope .pacing-panel input[type="range"] {
+  width: 100%;
+  margin: 8px 0 4px;
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+.pm-scope .toolbar {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.pm-scope .pill-toggle {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  border-radius: 99px;
+  padding: 6px 13px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s;
+}
+.pm-scope .pill-toggle.active { background: var(--gold); color: #1f1604; border-color: var(--gold-light); }
+
+.pm-scope .pm-section {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px;
+  margin: 14px 0;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+  transition: border-color .4s, box-shadow .4s, transform .4s;
+}
+.pm-scope .pm-section.focus-above {
+  position: relative;
+  z-index: 45;
+}
+.pm-scope .pm-section.critical-pulse {
+  border: 2px solid var(--crimson);
+  animation: dangerPulse .75s infinite alternate;
+}
+@keyframes dangerPulse {
+  from { box-shadow: 0 0 14px rgba(184, 29, 42, 0.35); }
+  to { box-shadow: 0 0 42px rgba(239, 68, 68, 0.9); }
+}
+
+.pm-scope .pm-section h3 { margin: 0 0 8px; font: 700 16px Georgia, serif; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.pm-scope .pm-sub { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+.pm-scope h4 { margin: 16px 0 8px; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+
+/* Indikator Kotak Suara Kelas X A & X B */
+.pm-scope .box-tracker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.pm-scope .btrack {
+  border: 1.5px solid var(--line);
+  border-radius: 11px;
+  padding: 8px 10px;
+  background: var(--bg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  transition: .3s;
+}
+.pm-scope .btrack.active {
+  border-color: var(--gold);
+  background: rgba(201,150,42,0.15);
+  box-shadow: 0 0 14px rgba(201,150,42,0.25);
+}
+.pm-scope .btrack.done {
+  border-color: var(--green);
+  opacity: .8;
+}
+.pm-scope .btrack span { font-family: monospace; font-size: 11.5px; color: var(--muted); }
+
+/* Live Ballot Ticker (Layar Ketegangan 2 Tahap) */
+.pm-scope .live-feed {
+  background: var(--navy);
+  color: #fff;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  border: 1.5px solid #c9962a88;
+  position: relative;
+  overflow: hidden;
+}
+.pm-scope .live-feed.sudden-death {
+  background: linear-gradient(135deg, #450a0a, #1e1b4b);
+  border-color: #ef4444;
+}
+.pm-scope .live-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #ffe89e;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.pm-scope .live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff3b3b;
+  margin-right: 6px;
+  animation: blink .5s infinite alternate;
+}
+@keyframes blink { from { opacity: 1; } to { opacity: .15; } }
+.pm-scope .ballot-msg {
+  font: 700 15px/1.45 system-ui, sans-serif;
+  color: #fff;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.pm-scope .unfold-bar {
+  height: 6px;
+  background: rgba(255,255,255,0.14);
+  border-radius: 99px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+.pm-scope .unfold-bar i {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #ffe89e, #f59e0b, #ef4444);
+}
+.pm-scope .lead-badge {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.14);
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #cbd5e1;
+}
+.pm-scope .lead-badge b { color: #ffe89e; }
+
+/* Tombol Manual Panitia */
+.pm-scope .manual-box {
+  margin-bottom: 12px;
+  display: flex;
+  gap: 8px;
+}
+.pm-scope .btn-next-ballot {
+  background: linear-gradient(135deg, #b81d2a, #7f1d1d);
+  color: #fff;
+  border: 1px solid #fca5a5;
+  border-radius: 11px;
+  padding: 12px;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  width: 100%;
+  box-shadow: 0 4px 16px rgba(184,29,42,0.4);
+}
+.pm-scope .btn-next-ballot:disabled { opacity: .45; cursor: not-allowed; }
+
+/* Live Scoreboard Mini di atas Grafik */
+.pm-scope .live-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.pm-scope .lcard {
+  border: 1.5px solid var(--line);
+  background: var(--bg);
+  border-radius: 11px;
+  padding: 10px 6px;
+  text-align: center;
+  transition: transform .4s cubic-bezier(.34,1.56,.64,1), border-color .25s, background .25s, box-shadow .25s;
+  position: relative;
+}
+/* Efek Roulette Scan saat mencari tahu siapa yang dicoblos */
+.pm-scope .lcard.scanning {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.22);
+  transform: scale(1.03);
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.45);
+}
+.pm-scope .lcard.bump {
+  transform: translateY(-7px) scale(1.07);
+  border-color: var(--gold);
+  box-shadow: 0 10px 24px rgba(201,150,42,0.38);
+}
+.pm-scope .lcard.leading {
+  border-color: var(--gold);
+  background: rgba(201,150,42,0.14);
+}
+.pm-scope .lcard small { display: block; font-size: 10px; font-weight: 800; color: var(--muted); }
+.pm-scope .lcard b { display: block; font: 900 24px Georgia, serif; margin: 2px 0; }
+.pm-scope .lcard span { display: block; font-size: 10.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.pm-scope .pm-btn {
+  border: 0;
+  border-radius: 12px;
+  min-height: 46px;
+  padding: 11px 18px;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  width: 100%;
+  transition: transform .15s, box-shadow .2s;
+}
+.pm-scope .pm-btn:active { transform: scale(.98); }
+.pm-scope .pm-gold {
+  background: linear-gradient(135deg, #d8a436, #b37f16);
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(201,150,42,0.35);
+}
+.pm-scope .pm-ghost {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  margin-top: 10px;
+}
+
+/* Chips & Selectors */
+.pm-scope .chips { display: flex; flex-wrap: wrap; gap: 7px; margin: 8px 0 12px; }
+.pm-scope .chip {
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  border-radius: 99px;
+  padding: 7px 13px;
+  font-weight: 700;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: .2s;
+}
+.pm-scope .chip:hover { border-color: var(--gold); background: rgba(201,150,42,0.15); color: var(--gold-deep); }
+.pm-scope .sel { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.pm-scope .sel label { font-size: 12px; color: var(--muted); font-weight: 700; }
+.pm-scope .sel select {
+  width: 100%;
+  margin-top: 4px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+}
+
+/* Stage & Candidate Cards */
+.pm-scope .stage {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 110px 8px 26px;
+  min-height: 330px;
+  border-radius: 14px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(201,150,42,0.12), transparent 70%);
+  overflow: hidden;
+}
+.pm-scope .stage.spot { background: radial-gradient(ellipse at 50% 0%, rgba(201,150,42,0.32), transparent 72%); }
+.pm-scope .stage.gal .cc { flex: 0 0 175px; }
+.pm-scope .stage.g3 .cc { flex: 1 1 0; min-width: 0; max-width: 210px; }
+
+.pm-scope .cc {
+  flex: 1;
+  min-width: 0;
+  max-width: 215px;
+  position: relative;
+  text-align: center;
+  padding: 18px 8px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+  transition: filter .6s, border-color .4s, box-shadow .4s;
+  z-index: 2;
+}
+.pm-scope .cc::before {
+  content: 'PASLON OSIS';
+  display: block;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+.pm-scope .cc .pm-no {
+  width: 40px;
+  height: 40px;
+  line-height: 38px;
+  margin: 0 auto 6px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #ffe89e;
+  border: 2px solid var(--gold);
+  font: 800 20px Georgia, serif;
+}
+.pm-scope .cc .nm { font-size: 12.5px; font-weight: 800; margin: 6px 0 4px; line-height: 1.3; }
+.pm-scope .cc .vt { font-size: 11px; color: var(--muted); font-weight: 600; }
+.pm-scope .cc .tag { font-size: 11px; font-weight: 800; margin-top: 8px; min-height: 16px; }
+
+.pm-scope .cc.win {
+  z-index: 5;
+  border-color: var(--gold);
+  background: linear-gradient(180deg, rgba(201,150,42,0.18), var(--bg));
+  animation: winFloat 1s forwards, winGlow 1.4s 1s infinite alternate;
+}
+.pm-scope .cc.win .tag { color: var(--gold-deep); }
+@keyframes winFloat { to { transform: translateY(-22px) scale(1.1); } }
+@keyframes winGlow {
+  from { box-shadow: 0 8px 20px rgba(201,150,42,0.35); }
+  to { box-shadow: 0 12px 44px 8px rgba(245,211,107,0.65); }
+}
+
+.pm-scope .tomb {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  opacity: 0;
+  transition: opacity .7s;
+  padding: 8px;
+}
+.pm-scope .tomb b { font-size: 11.5px; color: var(--ink); }
+.pm-scope .tomb small { font-size: 10.5px; color: var(--muted); }
+
+/* Banner Pemenang */
+.pm-scope .ban { text-align: center; opacity: 0; transform: scale(.6); min-height: 92px; margin-bottom: 4px; }
+.pm-scope .ban.on { animation: banPop .9s cubic-bezier(.34,1.56,.64,1) forwards; }
+@keyframes banPop { to { opacity: 1; transform: scale(1); } }
+.pm-scope .ban small, .pm-scope .ban span {
+  display: block;
+  font-weight: 800;
+  letter-spacing: .14em;
+  font-size: 11.5px;
+  color: var(--gold-deep);
+}
+.pm-scope .ban b {
+  display: block;
+  margin: 4px 0;
+  font: 900 clamp(20px, 5.5vw, 30px)/1.18 Georgia, serif;
+  background: linear-gradient(90deg, #b37f16, #ffe89e, #c9962a, #ffe89e);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shine 2.8s linear infinite;
+}
+@keyframes shine { to { background-position: -300% 0; } }
+
+/* Stats & Progress */
+.pm-scope .winner-status {
+  text-align: center;
+  background: rgba(201,150,42,0.14);
+  border: 1px solid rgba(201,150,42,0.35);
+  color: var(--gold-deep);
+  padding: 12px;
+  border-radius: 11px;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+.pm-scope .pm-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.pm-scope .pm-stat {
+  text-align: center;
+  padding: 12px 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+}
+.pm-scope .pm-stat b { display: block; font: 800 24px Georgia, serif; }
+.pm-scope .pm-stat small { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .04em; }
+.pm-scope .tp { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin: 12px 0 6px; }
+.pm-scope .pm-progress { height: 9px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.pm-scope .pm-progress i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #268552, #52b788);
+  transition: width 7s cubic-bezier(.16,1,.3,1);
+}
+.pm-scope .kr { display: grid; grid-template-columns: 64px 1fr 54px; gap: 10px; align-items: center; font-size: 12px; margin-bottom: 8px; }
+
+.pm-scope .rays {
+  position: absolute;
+  width: 480px;
+  height: 480px;
+  background: repeating-conic-gradient(from 0deg, rgba(245,211,107,0.35) 0 10deg, transparent 10deg 20deg);
+  -webkit-mask: radial-gradient(circle, #000 15%, transparent 68%);
+  mask: radial-gradient(circle, #000 15%, transparent 68%);
+  opacity: 0;
+  transition: opacity .8s;
+  animation: spinRays 14s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+@keyframes spinRays {
+  from { transform: translate(-50%,-50%) rotate(0deg); }
+  to { transform: translate(-50%,-50%) rotate(360deg); }
+}
+
+#fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 55; }
 </style></head>
 <body>
+<!-- Lapisan efek PEMILOS (layar gelap sudden death & kanvas konfeti/kembang api) -->
+<div id="blackout"></div>
+<canvas id="fx"></canvas>
+
 <header class="hero">
   <button class="theme" id="themeBtn" aria-label="Ganti tema">☾</button>
   <img class="hero-banner-img" src="https://i.ibb.co.com/hRzW8MmJ/file-00000000d19881fa978d5f8b2e086c7c.png" alt="Sekolah Nasional Terintegrasi 17 Tanjung Jabung Timur">
@@ -278,6 +787,7 @@ main{max-width:1080px;margin:auto;padding:36px 16px 70px}
   <div class="admin-tabs" id="admin-tabs">
     <button class="tab-btn active" data-tab="tab-sesi" onclick="showAdminTab('tab-sesi')">⚙️ Sesi</button>
     <button class="tab-btn" data-tab="tab-hasil" onclick="showAdminTab('tab-hasil')">📊 Hasil</button>
+    <button class="tab-btn" data-tab="tab-pengumuman" onclick="showAdminTab('tab-pengumuman')">🎬 Pengumuman</button>
     <button class="tab-btn" data-tab="tab-paslon" onclick="showAdminTab('tab-paslon')">🧑‍🤝‍🧑 Paslon</button>
     <button class="tab-btn" data-tab="tab-siswa" onclick="showAdminTab('tab-siswa')">🎓 Siswa</button>
     <button class="tab-btn" data-tab="tab-faq" onclick="showAdminTab('tab-faq')">❓ FAQ</button>
@@ -354,6 +864,68 @@ main{max-width:1080px;margin:auto;padding:36px 16px 70px}
     </div>
   </div>
 
+  <!-- ===== MENU PENGATURAN PENGUMUMAN PEMILOS (dipisah dari halaman pengumuman) ===== -->
+  <div class="tab-content hidden" id="tab-pengumuman">
+    <div class="section"><h3>Halaman Pengumuman Hasil Voting</h3>
+      <p class="sub" style="text-align:left;margin:0 0 12px">Atur kecepatan, mode manual, audio, dan animasi di bawah ini. Semua pengaturan otomatis dipakai saat tombol “Buka Segel Kotak Suara” ditekan di halaman Pengumuman.</p>
+      <button class="btn gold full" onclick="openPemilos()">📢 Buka Halaman Pengumuman Hasil Voting</button>
+    </div>
+
+    <div class="pm-scope">
+      <div class="pm-hero">
+        <div class="hero-badge">⚙️ Pengaturan Animasi Pengumuman</div>
+
+        <div class="pacing-panel">
+          <div class="pacing-row">
+            <span>⏱️ Kecepatan Buka per 1 Kertas Suara:</span>
+            <span id="paceLabel">3.6 Detik / Suara (Sangat Dramatis)</span>
+          </div>
+          <input type="range" id="paceRange" min="2000" max="7000" step="200" value="3600">
+          <div style="display:flex;justify-content:space-between;font-size:10.5px;color:#b8c2e0">
+            <span>2.0 dtk/suara</span>
+            <span>3.6 dtk (Rekomendasi)</span>
+            <span>7.0 dtk/suara (Super Lambat)</span>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <button class="pill-toggle" id="manualToggle">✋ Mode Klik Manual Panitia: OFF</button>
+          <button class="pill-toggle active" id="sfxBtn">🔊 Audio Sirene &amp; Detak Jantung: ON</button>
+        </div>
+      </div>
+
+      <!-- STUDIO PREVIEW ANIMASI OSIS -->
+      <div class="pm-section" id="gal">
+        <h3>🎬 Studio Preview Animasi PEMILOS</h3>
+        <p class="pm-sub">Klik untuk melihat contoh animasi eliminasi dan pelantikan sebelum membuka kotak suara X A &amp; X B.</p>
+
+        <div class="stage gal" id="gstage"></div>
+
+        <h4>1. Paket Alur Cerita Sidang &amp; Pelantikan</h4>
+        <div class="chips" id="pchips"></div>
+        <p class="pm-sub" id="pdesc" style="margin:4px 0 10px;font-weight:600;color:var(--gold-deep)"></p>
+
+        <h4>2. Animasi Paslon Gugur / Belum Terpilih</h4>
+        <div class="chips" id="chips"></div>
+
+        <h4>3. Animasi Paslon Terpilih (Pelantikan)</h4>
+        <div class="chips" id="wchips"></div>
+
+        <div class="sel">
+          <label>Paslon Suara Terendah
+            <select id="sel0"></select>
+          </label>
+          <label>Paslon Suara Kedua
+            <select id="sel1"></select>
+          </label>
+          <label style="grid-column: span 2">Seremoni Pelantikan Pemenang
+            <select id="selw"></select>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="tab-content hidden" id="tab-paslon">
     <div class="section">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
@@ -405,6 +977,117 @@ main{max-width:1080px;margin:auto;padding:36px 16px 70px}
     </div>
   </div>
 </section>
+
+<!-- ===== HALAMAN PENGUMUMAN HASIL VOTING (PEMILOS) ===== -->
+<section id="pemilos-page" class="pm-root hidden">
+  <div style="max-width:780px;margin:0 auto 10px;padding:0 14px">
+    <button class="btn ghost small-btn" onclick="closePemilos()">← Kembali ke Dashboard</button>
+  </div>
+  <div class="pm-scope pm-main">
+    <!-- HEADER RESMI PEMILOS (KHUSUS 2 KELAS: X A & X B) -->
+    <header class="pm-hero">
+      <div class="hero-badge">🗳️ Komisi Pemilihan OSIS (KPO)</div>
+      <h1>Pengumuman Hasil Voting OSIS</h1>
+      <p>Rekapitulasi 2 Kotak Suara: Kelas X A &amp; Kelas X B (40 Siswa)</p>
+    </header>
+
+    <!-- TOMBOL MULAI PENGHITUNGAN -->
+    <div class="pm-section" id="pm-reveal-card" style="text-align:center">
+      <h3 style="justify-content:center">🔐 2 Kotak Suara (X A &amp; X B) Siap Dibuka</h3>
+      <p class="pm-sub">Panitia akan membuka Kotak Suara <b>Kelas X A</b> terlebih dahulu, dilanjutkan Kotak Suara penentu dari <b>Kelas X B</b>.</p>
+      <button class="pm-btn pm-gold" id="goBtn">🔓 Buka Segel Kotak Suara Kelas X A &amp; X B</button>
+    </div>
+
+    <!-- HASIL REKAPITULASI -->
+    <div id="results" class="hidden">
+      <div class="pm-section">
+        <h3>📊 Kehadiran Pemilih (Kelas X A &amp; X B)</h3>
+        <div id="winner" class="winner-status"></div>
+        <div class="pm-stats">
+          <div class="pm-stat"><b id="s-total">0</b><small>TOTAL SISWA</small></div>
+          <div class="pm-stat"><b id="s-voted" style="color:var(--green)">0</b><small>SUARA SAH</small></div>
+          <div class="pm-stat"><b id="s-unvoted" style="color:var(--crimson)">0</b><small>TIDAK HADIR</small></div>
+        </div>
+        <div class="tp"><b>Partisipasi Pemilih (X A &amp; X B)</b><b id="pm-turnout">0%</b></div>
+        <div class="pm-progress"><i id="tbar"></i></div>
+        <h4>Partisipasi Per Kelas</h4>
+        <div id="kbars"></div>
+      </div>
+
+      <div class="pm-section" id="chart-sec">
+        <h3>
+          <span>📈 Perhitungan Suara Satu per Satu</span>
+          <span id="ballot-counter" style="font-size:12px;color:var(--muted);font-family:monospace">0 / 38 Suara</span>
+        </h3>
+
+        <!-- Status 2 Kotak Suara: Kelas X A dan Kelas X B -->
+        <div class="box-tracker">
+          <div class="btrack" id="box-xa">
+            <div>📦 Kotak Kelas X A</div>
+            <span id="cnt-xa">0 / 19 dibuka</span>
+          </div>
+          <div class="btrack" id="box-xb">
+            <div>📦 Kotak Kelas X B</div>
+            <span id="cnt-xb">Menunggu giliran</span>
+          </div>
+        </div>
+
+        <!-- Layar Live Feed Surat Suara -->
+        <div class="live-feed" id="live-feed-box">
+          <div class="live-top">
+            <span><i class="live-dot"></i>SIDANG REKAPITULASI KPO</span>
+            <span id="tension-tag">PERSIAPAN</span>
+          </div>
+          <div class="ballot-msg" id="ballot-msg">Menyiapkan pembukaan Kotak Suara Kelas X A...</div>
+          <div class="unfold-bar"><i id="unfold-fill"></i></div>
+          <div class="lead-badge">
+            <span id="lead-status">Pimpinan Sementara: <b>Belum ada</b></span>
+            <span id="gap-status">Selisih Puncak: <b>0 suara</b></span>
+          </div>
+        </div>
+
+        <!-- Tombol Buka Manual jika Mode Manual Aktif -->
+        <div class="manual-box hidden" id="manualBox">
+          <button class="btn-next-ballot" id="nextBallotBtn">🗳️ Buka Surat Suara Berikutnya (Tekan SPASI)</button>
+        </div>
+
+        <!-- Scoreboard Angka Live -->
+        <div class="live-cards">
+          <div class="lcard" id="lc0">
+            <small>PASLON 01</small>
+            <b id="lv0">0</b>
+            <span>Alesia &amp; Vania</span>
+          </div>
+          <div class="lcard" id="lc1">
+            <small>PASLON 02</small>
+            <b id="lv1">0</b>
+            <span>Aurelia &amp; Cinta</span>
+          </div>
+          <div class="lcard" id="lc2">
+            <small>PASLON 03</small>
+            <b id="lv2">0</b>
+            <span>Bunga &amp; Zaquita</span>
+          </div>
+        </div>
+
+        <canvas id="pm-chart"></canvas>
+      </div>
+
+      <div class="pm-section hidden" id="finale">
+        <h3 style="justify-content:center">🏛️ Sidang Pleno Penetapan &amp; Pelantikan</h3>
+        <div class="ban" id="ban"></div>
+        <div class="stage" id="stage"></div>
+      </div>
+
+      <div class="pm-section hidden" id="lbwrap">
+        <h3>🏅 Berita Acara Perolehan Suara Akhir</h3>
+        <div id="lb"></div>
+      </div>
+    </div>
+
+    <button class="pm-btn pm-ghost hidden" id="againBtn">↻ Ulangi Simulasi dengan Skenario Suara Baru</button>
+  </div>
+</section>
 </main>
 
 <div id="toast" class="toast hidden" aria-live="polite"></div>
@@ -433,7 +1116,18 @@ function toast(x,actionLabel,actionFn){
   if(actionLabel)$('toastAction').onclick=()=>{actionFn();$('toast').classList.add('hidden');};
   $('toast').classList.remove('hidden');clearTimeout(window.t);window.t=setTimeout(()=>$('toast').classList.add('hidden'),actionLabel?6500:3800);
 }
-function showPage(id){document.querySelectorAll('main > .panel').forEach(x=>x.classList.add('hidden'));$(id).classList.remove('hidden');scrollTo(0,0)}
+function showPage(id){
+  if(id!=='pemilos-page'&&window.PM)window.PM.stop();
+  document.querySelectorAll('main > .panel, main > .pm-root').forEach(x=>x.classList.add('hidden'));$(id).classList.remove('hidden');scrollTo(0,0)
+}
+function openPemilos(){
+  if(window.PM)window.PM.reset();
+  showPage('pemilos-page');
+}
+function closePemilos(){
+  if(window.PM)window.PM.stop();
+  showPage('admin-page');showAdminTab('tab-pengumuman');
+}
 function showAdminTab(id){
   document.querySelectorAll('#admin-page .tab-content').forEach(el=>el.classList.add('hidden'));
   document.querySelectorAll('#admin-tabs .tab-btn').forEach(b=>b.classList.remove('active'));
@@ -1171,5 +1865,74 @@ $('themeBtn').onclick=()=>{let d=document.documentElement.dataset.theme!=='dark'
 if(localStorage.getItem('theme')==='dark')document.documentElement.dataset.theme='dark';
 restoreSession();
 </script>
-</body>
-</html>
+
+<!-- =====================================================================
+     PEMILOS — Kode animasi pengumuman (JS asli, dibungkus IIFE agar nama
+     fungsi/variabel tidak bentrok dengan kode Vote OSIS di atas)
+     ===================================================================== -->
+<script>
+(function () {
+const $ = id => document.getElementById(id);
+const rnd = n => Math.random() * n;
+
+const CANDS = [
+  'Alesia Zahra & Vania Almufidah',
+  'Aurelia Febrina & Cinta Aninda',
+  'Bunga Rachelia & Zaquita Siti'
+];
+const PAL = ['#1e3a8a', '#c9962a', '#268552'];
+const PHRASES = [
+  '🔓 Membuka segel Kotak Suara Kelas X A & X B…',
+  '📋 Mencocokkan 40 daftar hadir siswa Kelas X A & X B…',
+  '🗳️ Memisahkan tumpukan surat suara Kelas X A dan X B…',
+  '⚖️ Saksi MPK bersiap membuka Kotak Suara Kelas X A terlebih dahulu…'
+];
+
+let basePaceMs = 3600;
+let manualMode = false;
+let sfxOn = true;
+let D, chart, token = 0, susp = null, raceTimers = [], gt = null;
+let manualNextTrigger = null;
+
+$('paceRange').oninput = e => {
+  basePaceMs = Number(e.target.value);
+  const sec = (basePaceMs / 1000).toFixed(1);
+  $('paceLabel').textContent = `${sec} Detik / Suara (Sangat Dramatis)`;
+};
+
+$('manualToggle').onclick = () => {
+  manualMode = !manualMode;
+  $('manualToggle').classList.toggle('active', manualMode);
+  $('manualToggle').textContent = manualMode
+    ? '✋ Mode Klik Manual Panitia: ON'
+    : '✋ Mode Klik Manual Panitia: OFF';
+  $('manualBox').classList.toggle('hidden', !manualMode);
+};
+
+addEventListener('keydown', e => {
+  if (manualMode && e.code === 'Space' && manualNextTrigger && !$('nextBallotBtn').disabled) {
+    e.preventDefault();
+    manualNextTrigger();
+  }
+});
+$('nextBallotBtn').onclick = () => {
+  if (manualNextTrigger) manualNextTrigger();
+};
+
+/* ==========================================
+   SISTEM AUDIO SINTETIS (DETAK JANTUNG, SIRENE, ROULETTE)
+   ========================================== */
+let actx = null;
+function initAudio() {
+  if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+  if (actx.state === 'suspended') actx.resume();
+}
+function playTone(freq, type, dur, delay = 0, vol = 0.12) {
+  if (!sfxOn) return;
+  initAudio();
+  setTimeout(() => {
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, actx.currentTime);
+    g.gain.setValueAtTime(vol, actx.currentTime);
+    g.gain.exponentialRampToValue
